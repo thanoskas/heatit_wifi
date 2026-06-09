@@ -1,0 +1,12 @@
+{
+   "domain": "heatit_wifi6_custom",
+   "name": "Heatit WiFi6 (Custom)",
+   "version": "1.1.1",
+   "config_flow": true,
+   "documentation": "https://github.com/atlehogberg/heatit_wifi6_custom",
+   "dependencies": ["network"],
+   "requirements": ["aiohttp"],
+   "codeowners": ["@atlehogberg"],
+   "iot_class": "local_polling",
+   "issue_tracker": "https://github.com/atlehogberg/heatit_wifi6_custom/issues"
+ }

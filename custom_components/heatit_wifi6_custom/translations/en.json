@@ -1,0 +1,26 @@
+{
+   "title": "Heatit WiFi6 Thermostat",
+   "config": {
+      "error": {
+         "cannot_connect": "Connect failed. Please check the address. It should contain only url base address. E.g. http://192.168.10.5 ",
+         "unknown": "Unknown error."
+      },
+      "step": {
+         "user": {
+            "title": "Configure Heatit WiFi6",
+            "description": "Enter short name and base url address for the thermostat",
+            "data": {
+               "name": "Name ",
+               "host": "Device base URL. E.g. http://192.168.10.5 "
+            },
+            "add_device_done": "Thermostat %s added with ip-address: %s"
+         }
+      }
+   },
+   "device": {
+      "name": "Thermostat",
+      "temperature": "Temperature",
+      "target_temperature": "Target Temperature",
+      "hvac_mode": "HVAC Mode"
+   }
+}

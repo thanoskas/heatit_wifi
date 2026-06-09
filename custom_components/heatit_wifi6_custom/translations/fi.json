@@ -1,0 +1,26 @@
+{
+   "title": "Heatit WiFi6 Termostaatti",
+   "config": {
+      "error": {
+         "cannot_connect": "Yhteys epäonnistui. Tarkista osoite ja anna vain url-osoitteen perusosa, esim. http://192.168.10.5 ",
+         "unknown": "Tuntematon virhe."
+      },
+      "step": {
+         "user": {
+            "title": "Määritä Heatit WiFi6",
+            "description": "Anna termostaatille lyhyt nimi ja url osoitteen perusosa.",
+            "data": {
+               "name": "Nimi ",
+               "host": "Laitteen perus-URL. Esim. http://192.168.10.5 "
+            },
+            "add_device_done": "Termostaatti %s liästty ip-osoitteella: %s"
+         }
+      }
+   },
+   "device": {
+      "name": "Termostaatti",
+      "temperature": "Lämpötila",
+      "target_temperature": "Asetuslämpötila",
+      "hvac_mode": "Laitteen tila"
+   }
+}

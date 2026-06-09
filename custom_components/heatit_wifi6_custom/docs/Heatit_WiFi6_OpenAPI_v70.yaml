@@ -1,0 +1,993 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: Local HTTP API
+    url: http://{APIUrl}
+    variables:
+      APIUrl:
+        default: "192.168.104.118"
+        description: Base Url to API
+
+info:
+  version: "7.0.0"
+  title: WiFi 6
+  description: The API documentation for WiFi 6 thermostat
+  contact:
+    name: Heatit Support
+    url: https://heatit.com/contact
+    email: post@heatit.com
+  termsOfService: https://heatit.com/terms-of-use-private
+
+externalDocs:
+  description: Heatit's documents page
+  url: http://documents.heatit.com
+
+tags:
+  - name: "Thermostat"
+    description: Get data from the device
+  - name: "Parameters"
+    description: Change parameters on the device
+  - name: "Reset"
+    description: Reset settings, kwh or entire device to factory defaults
+
+paths:
+  /api/status:
+    get:
+      tags:
+        - Thermostat
+      description: returns all information about thermostat
+      responses:
+        '200':
+          description: All the devices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceInfo'
+
+  /api/parameters:
+    post:
+      tags:
+        - Parameters
+      description:  List of all parameters
+      parameters:
+        - $ref: '#/components/parameters/disableButtons'
+        - $ref: '#/components/parameters/sensorMode'
+        - $ref: '#/components/parameters/sensorValue'
+        - $ref: '#/components/parameters/internalMinimumTemperatureLimit'
+        - $ref: '#/components/parameters/internalMaximumTemperatureLimit'
+        - $ref: '#/components/parameters/floorMinimumTemperatureLimit'
+        - $ref: '#/components/parameters/floorMaximumTemperatureLimit'
+        - $ref: '#/components/parameters/externalMinimumTemperatureLimit'
+        - $ref: '#/components/parameters/externalMaximumTemperatureLimit'
+        - $ref: '#/components/parameters/internalCalibration'
+        - $ref: '#/components/parameters/floorCalibration'
+        - $ref: '#/components/parameters/externalCalibration'
+        - $ref: '#/components/parameters/regulationMode'
+        - $ref: '#/components/parameters/temperatureControlHysteresis'
+        - $ref: '#/components/parameters/temperatureDisplay'
+        - $ref: '#/components/parameters/activeDisplayBrightness'
+        - $ref: '#/components/parameters/standbyDisplayBrightness'
+        - $ref: '#/components/parameters/actionAfterError'
+        - $ref: '#/components/parameters/heatingSetpoint'
+        - $ref: '#/components/parameters/coolingSetpoint'
+        - $ref: '#/components/parameters/ecoSetpoint'
+        - $ref: '#/components/parameters/powerRegulatorActiveTime'
+        - $ref: '#/components/parameters/operatingMode'
+        - $ref: '#/components/parameters/openWindowDetection'
+        - $ref: '#/components/parameters/sizeOfLoad'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  disableButtons:
+                    $ref: '#/components/parameters/disableButtons'
+                  sensorMode:
+                    $ref: '#/components/parameters/sensorMode'
+                  sensorValue:
+                    $ref: '#/components/parameters/sensorValue'
+                  internalMinimumTemperatureLimit:
+                    $ref: '#/components/parameters/internalMinimumTemperatureLimit'
+                  internalMaximumTemperatureLimit:
+                    $ref: '#/components/parameters/internalMaximumTemperatureLimit'
+                  floorMinimumTemperatureLimit:
+                    $ref: '#/components/parameters/floorMinimumTemperatureLimit'
+                  floorMaximumTemperatureLimit:
+                    $ref: '#/components/parameters/floorMaximumTemperatureLimit'
+                  externalMinimumTemperatureLimit:
+                    $ref: '#/components/parameters/externalMinimumTemperatureLimit'
+                  externalMaximumTemperatureLimit:
+                    $ref: '#/components/parameters/externalMaximumTemperatureLimit'
+                  internalCalibration:
+                    $ref: '#/components/parameters/internalCalibration'
+                  floorCalibration:
+                    $ref: '#/components/parameters/floorCalibration'
+                  externalCalibration:
+                    $ref: '#/components/parameters/externalCalibration'
+                  regulationMode:
+                    $ref: '#/components/parameters/regulationMode'
+                  temperatureControlHysteresis:
+                    $ref: '#/components/parameters/temperatureControlHysteresis'
+                  temperatureDisplay:
+                    $ref: '#/components/parameters/temperatureDisplay'
+                  activeDisplayBrightness:
+                    $ref: '#/components/parameters/activeDisplayBrightness'
+                  standbyDisplayBrightness:
+                    $ref: '#/components/parameters/standbyDisplayBrightness'
+                  actionAfterError:
+                    $ref: '#/components/parameters/actionAfterError'
+                  heatingSetpoint:
+                    $ref: '#/components/parameters/heatingSetpoint'
+                  coolingSetpoint:
+                    $ref: '#/components/parameters/coolingSetpoint'
+                  ecoSetpoint:
+                    $ref: '#/components/parameters/ecoSetpoint'
+                  powerRegulatorActiveTime:
+                    $ref: '#/components/parameters/powerRegulatorActiveTime'
+                  operatingMode:
+                    $ref: '#/components/parameters/operatingMode'
+                  openWindowDetection:
+                    $ref: '#/components/parameters/openWindowDetection'
+                  sizeOfLoad:
+                    $ref: '#/components/parameters/sizeOfLoad'
+
+  /api/reset/factory:
+    delete:
+      tags:
+        - Reset
+      summary: Reset the device to factory default.
+      description: Reset to factory defaults.
+      parameters:
+        - $ref: "#/components/parameters/reset"
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              examples:
+                success:
+                  value:
+                    status: success
+                failed:
+                  value:
+                    status: failed
+
+  /api/reset/settings:
+    delete:
+      tags:
+        - Reset
+      summary: Reset settings to factory default.
+      description: Reset settings to factory defaults.
+      parameters:
+        - $ref: "#/components/parameters/reset"
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              examples:
+                success:
+                  value:
+                    status: success
+                failed:
+                  value:
+                    status: failed
+  /api/reset/kwh:
+    delete:
+      tags:
+        - Reset
+      summary: Reset  Kwh to 0.
+      description: Reset Kwh to zero.
+      parameters:
+        - $ref: "#/components/parameters/reset"
+      responses:
+        "200":
+          description: Successful
+          content:
+            application/json:
+              examples:
+                success:
+                  value:
+                    status: success
+                failed:
+                  value:
+                    status: failed
+
+components:
+  parameters:
+    disableButtons:
+      name: disableButtons
+      description: >
+        Disable buttons, must be enabled through the parameter, or turned back on locally by holding the center and right button for 30 seconds until the display shows “UNLK”
+        <br>**false** = **0** = buttons are not disabled. (Default)
+        <br>**true** = **1** = buttons are disabled.
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/disableButtons"
+      example: false
+    sensorMode:
+      name: sensorMode
+      description: >
+        Choose which sensor mode the device should operate with
+        <br>**0** = Floor sensor (F)
+        <br>**1** = Internal sensor (A) (Default)
+        <br>**2** = Internal sensor & floor sensor limitation (AF)
+        <br>**3** = External sensor (A2)
+        <br>**4** = External sensor & floor sensor limitation (A2F)
+        <br>**5** = Power regulator mode (PWER)
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/sensorMode"
+      example: 1
+    sensorValue:
+      name: sensorValue
+      description: >
+        Select the resistance value of the connected NTC
+        <br>**0** = 10KΩ (Default)
+        <br>**1** = 12KΩ
+        <br>**2** = 15KΩ
+        <br>**3** = 22KΩ
+        <br>**4** = 33KΩ
+        <br>**5** = 47KΩ
+        <br>**6** = 6,8KΩ
+        <br>**7** = 100KΩ
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/sensorValue"
+      example: 0
+    internalMinimumTemperatureLimit:
+      name: internalMinTemperature
+      description: >
+        Decides the lowest temperature allowed by the thermostat when using sensor mode A.
+        <br>Minimum: **5.0** = 5.0°C (Default)
+        <br>Maximum: **40.0** = 40.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/internalMinimumTemperatureLimit"
+      example: 5.5
+    internalMaximumTemperatureLimit:
+      name: internalMaximumTemperatureLimit
+      description: >
+        Decide the highest temperature allowed by the thermostat when using sensor mode A.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Maximum: **40.0** = 40.0°C (Default)
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/internalMaximumTemperatureLimit"
+      example: 39.5
+    floorMinimumTemperatureLimit:
+      name: floorMinimumTemperatureLimit
+      description: >
+        Devices the lowest temperature allowed by the thermostat when using sensor mode AF, F, A2F.
+        <br>Minimum: **5.0** = 5.0°C (Default)
+        <br>Maximum: **40.0** = 40.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/floorMinimumTemperatureLimit"
+      example: 5.5
+    floorMaximumTemperatureLimit:
+      name: floorMaximumTemperatureLimit
+      description: >
+        Decide the highest temperature allowed by the thermostat when using sensor mode AF, F, A2F.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Maximum: **40.0** = 40.0°C (Default)
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/floorMaximumTemperatureLimit"
+      example: 39.5
+    externalMinimumTemperatureLimit:
+      name: externalMinimumTemperatureLimit
+      description: >
+        Decide the lowest temperature allowed by the thermostat when using sensor mode A2.
+        <br>Minimum: **5.0** = 5.0°C (Default)
+        <br>Maximum: **40.0** = 40.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/externalMinimumTemperatureLimit"
+      example: 5.5
+    externalMaximumTemperatureLimit:
+      name: externalMaximumTemperatureLimit
+      description: >
+        Decide the highest temperature allowed by the thermostat when using sensor mode A2.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Maximum: **40.0** = 40.0°C (Default)
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/externalMaximumTemperatureLimit"
+      example: 39.5
+    internalCalibration:
+      name: internalCalibration
+      description: >
+        Manually calibrate sensor A ±6°C
+        <br>Minimum: **-6.0** = -6.0°C
+        <br>Default: **0.0** = 0.0°C
+        <br>Maximum: **6.0** = +6.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/internalCalibration"
+      example: -2.3
+    floorCalibration:
+      name: floorCalibration
+      description: >
+        Manually calibrate sensor F ±6°C
+        <br>Minimum: **-6.0** = -6.0°C
+        <br>Default: **0.0** = 0.0°C
+        <br>Maximum: **6.0** = +6.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/floorCalibration"
+      example: -2.3
+    externalCalibration:
+      name: externalCalibration
+      description: >
+        Manually calibrate sensor A2 ±6°C
+        <br>Minimum: **-6.0** = -6.0°C
+        <br>Default: **0.0** = 0.0°C
+        <br>Maximum: **6.0** = +6.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/externalCalibration"
+      example: -2.3
+    regulationMode:
+      name: regulationMode
+      description: >
+        Choose between regulation modes PWM and Hysteresis
+        <br>**false** = **0** = Hysteresis
+        <br>**true** = **1** = PWM
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/regulationMode"
+      example: false
+    temperatureControlHysteresis:
+      name: temperatureControlHysteresis
+      description: >
+        Choose the hysteresis used when regulation mode is set to HYST.
+        <br>Minimum: **0.3** = 0.3°C
+        <br>Default: **0.5** = 0.5°C
+        <br>Maximum: **3.0** = 3.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/temperatureControlHysteresis"
+      example: 0.5
+    temperatureDisplay:
+      name: temperatureDisplay
+      description: >
+        Select what is shown on the display during Standby state
+        <br>**false** = **0** = Display setpoint
+        <br>**true** = **1** = Display measured temperature
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/temperatureDisplay"
+      example: false
+    activeDisplayBrightness:
+      name: activeDisplayBrightness
+      description: >
+        Configure the brightness of the display during active state.
+        <br>**1** = 10%
+        <br>**10** = 100% (Default)
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/activeDisplayBrightness"
+      example: 10
+    standbyDisplayBrightness:
+      name: standbyDisplayBrightness
+      description: >
+        Configure the brightness of the display during standby state
+        <br>Minimum: **1** = 10%
+        <br>Default: **5** = 50%
+        <br>Maximum: **10** = 100%
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/standbyDisplayBrightness"
+      example: 5
+    actionAfterError:
+      name: actionAfterError
+      description: >
+        Decide how the device should react when the overload / overheating features has turned OFF relay (Default 0)
+        <br>**0** = device will turn off and show an error in the display. (Default)
+        <br>**10 - 65535** = 10seconds - 65535seconds = device will attempt to turn on again after an error based on the delay specified.
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/actionAfterError"
+      example: 300
+    heatingSetpoint:
+      name: heatingSetpoint
+      description: >
+        Set setpoint for Heating mode (Default 210)
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Default: **21.0** = 21.0°C
+        <br>Maximum: **40.0** = 40.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/heatingSetpoint"
+      example: 21.5
+    coolingSetpoint:
+      name: coolingSetpoint
+      description: >
+        Set setpoint for Cooling mode.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Default: **18.0** = 18.0°C
+        <br>Maximum: **40.0** = 40.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/coolingSetpoint"
+      example: 18.5
+    ecoSetpoint:
+      name: ecoSetpoint
+      description: >
+        Set setpoint for ECO mode
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Default: **18.0** = 18.0°C
+        <br>Maximum: **40.0** = 40.0°C
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/ecoSetpoint"
+      example: 18.5
+    powerRegulatorActiveTime:
+      name: powerRegulatorActiveTime
+      description: >
+        Set the % of time the relay should be active when using PWER mode. (30-minute duty cycle) (Default 2)
+        <br>Minimum: **1** = 10% = 3 minutes on - 27 minutes off. 
+        <br>Default: **2** = 20% = 6 minutes on - 24 minutes off. 
+        <br>Maximum: **10** = 100%
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/powerRegulatorActiveTime"
+      example: 2
+    operatingMode:
+      name: operatingMode
+      description: >
+        Set the thermostat mode
+        <br>**0** = OFF
+        <br>**1** = Heating mode (Default)
+        <br>**2** = Cooling mode
+        <br>**3** = ECO mode
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/operatingMode"
+      example: 1
+    openWindowDetection:
+      name: openWindowDetection
+      description: >
+        Choose to enable or disable the Open windows detection
+        <br>**false** = **0** = Open Window Detection is disabled. (Default)
+        <br>**true** = **1** = Open Window Detection is enabled.
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/openWindowDetection"
+      example: false
+    sizeOfLoad:
+      name: sizeOfLoad
+      description: >
+        Allows the user to decide the power consumption of the connected load in 100W increments (Default 0)
+        <br>**0** = Uses power metering values. (Default)
+        <br>**1** - **99** = 100W - 9900W = Allows the user to set the size of the load, used when connected to a contactor
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/sizeOfLoad"
+      example: 0
+
+    reset:
+      name: reset
+      description: Requires the string "reset" to prevent accidental resets.
+      in: query
+      required: true
+      schema:
+          type: string
+          enum:
+            - reset
+      example: reset
+
+  schemas:
+    DeviceInfo:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Unique id for each device.
+          example: dfkfj38f652900jd
+        name:
+          type: string
+          description: Device name from the MyHeatit app. 
+          example: Thermostat hall
+        room:
+          type: string
+          description: The room the device is linked to in the MyHeatit app. 
+          example: hall
+        state:
+          type: boolean
+          description: current heating state of the thermostat.
+            <br>**Idle** = relay is open. 
+            <br>**Heating** = relay is closed in heating- or eco mode.
+            <br>**Cooling** = relay is closed in cooling mode.
+          enum:
+            - Idle
+            - Heating
+            - Cooling
+          example: Idle
+        currentPower:
+          type: integer
+          pattern: '^\d{1,4}$'
+          description: Current power draw of the device in watt.
+          example: 2500
+        totalConsumption:
+          type: number
+          format: float
+          pattern: '^\d+\.\d{2}$'
+          description: Total consumption in kWh
+          example: 624.24
+        internalTemperature:
+          type: number
+          format: float
+          pattern: '^-?\d{1,3}\.\d{1}$'
+          description: Current measurement from the internal temperature sensor.
+          example: 20.2
+        floorTemperature:
+          type: number
+          format: float
+          pattern: '^-?\d{1,3}\.\d{1}$'
+          description: Current measurement from the floor temperature sensor.
+          example: 21.2
+        externalTemperature:
+          type: number
+          format: float
+          pattern: '^-?\d{1,3}\.\d{1}$'
+          description: Current measurement from the external temperature sensor.
+          example: 22.2
+        parameters: 
+          type: object
+          properties:
+            disableButtons:
+              $ref: '#/components/parameters/disableButtons'
+            sensorMode:
+              $ref: '#/components/parameters/sensorMode'
+            sensorValue:
+              $ref: '#/components/parameters/sensorValue'
+            internalMinimumTemperatureLimit:
+              $ref: '#/components/parameters/internalMinimumTemperatureLimit'
+            internalMaximumTemperatureLimit:
+              $ref: '#/components/parameters/internalMaximumTemperatureLimit'
+            floorMinimumTemperatureLimit:
+              $ref: '#/components/parameters/floorMinimumTemperatureLimit'
+            floorMaximumTemperatureLimit:
+              $ref: '#/components/parameters/floorMaximumTemperatureLimit'
+            externalMinimumTemperatureLimit:
+              $ref: '#/components/parameters/externalMinimumTemperatureLimit'
+            externalMaximumTemperatureLimit:
+              $ref: '#/components/parameters/externalMaximumTemperatureLimit'
+            internalCalibration:
+              $ref: '#/components/parameters/internalCalibration'
+            floorCalibration:
+              $ref: '#/components/parameters/floorCalibration'
+            externalCalibration:
+              $ref: '#/components/parameters/externalCalibration'
+            regulationMode:
+              $ref: '#/components/parameters/regulationMode'
+            temperatureControlHysteresis:
+              $ref: '#/components/parameters/temperatureControlHysteresis'
+            temperatureDisplay:
+              $ref: '#/components/parameters/temperatureDisplay'
+            activeDisplayBrightness:
+              $ref: '#/components/parameters/activeDisplayBrightness'
+            standbyDisplayBrightness:
+              $ref: '#/components/parameters/standbyDisplayBrightness'
+            actionAfterError:
+              $ref: '#/components/parameters/actionAfterError'
+            heatingSetpoint:
+              $ref: '#/components/parameters/heatingSetpoint'
+            coolingSetpoint:
+              $ref: '#/components/parameters/coolingSetpoint'
+            ecoSetpoint:
+              $ref: '#/components/parameters/ecoSetpoint'
+            powerRegulatorActiveTime:
+              $ref: '#/components/parameters/powerRegulatorActiveTime'
+            operatingMode:
+              $ref: '#/components/parameters/operatingMode'
+            OWD:
+              type: object
+              properties:
+                openWindowDetection:
+                  $ref: '#/components/parameters/openWindowDetection'
+                activeNow:
+                  type: boolean
+                  description: Shows the current status of the Open Window Detection
+                    <br>**false** = Open Window detection is currently not triggered. 
+                    <br>**true** = An Open Window has been detected and the setpoint is lowered.
+                  example: false
+                activeTime:
+                  type: integer
+                  description: Number of seconds left until Open Window Detection returns to normal setpoint. 
+                    Device can also return to previous setpoint if the temperature is changed from the local controls, or if the temperatre rises by 3°.
+                  example: 3600
+            sizeOfLoad:
+              $ref: '#/components/parameters/sizeOfLoad'
+        network:
+          type: object
+          properties:
+            SSID:
+              type: string
+              description: SSID of the connected wifi network
+              example: "Home WiFi"
+            mac:
+              type: string
+              description: Mac address of the device
+              example: "aa:bb:cc:11:22:33"
+            ipAddress:
+              type: string
+              description: IP address of the device on the local network. 
+              example: 192.168.1.10
+            wifiSignalStrength:
+              type: string
+              description: Wifi signal strength
+              example: "65dBm"
+            status:
+              type: string
+              description: Status of the connection.
+              example: ok
+        firmware:
+          type: string
+          description: Current firmware version of the device. 
+          example: "1.2"
+
+    #Parameters
+    disableButtons:
+      type: boolean
+      description: >
+        Disable buttons, must be enabled through the parameter, or turned back on locally by holding the center and right button for 30 seconds until the display shows “UNLK”
+        <br>**false** = **0** = buttons are not disabled. (Default)
+        <br>**true** = **1** = buttons are disabled.
+      enum:
+        - false
+        - true
+        - 0
+        - 1
+      default: false
+    sensorMode:
+      type: integer
+      pattern: '^\d{1}$'
+      description: >
+        Choose which sensor mode the device should operate with
+        <br>**0** = Floor sensor (F)
+        <br>**1** = Internal sensor (A) (Default)
+        <br>**2** = Internal sensor & floor sensor limitation (AF)
+        <br>**3** = External sensor (A2)
+        <br>**4** = External sensor & floor sensor limitation (A2F)
+        <br>**5** = Power regulator mode (PWER)
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+      minimum: 0
+      maximum: 5
+      default: 1
+    sensorValue:
+      type: integer
+      pattern: '^\d{1}$'
+      description: >
+        Select the resistance value of the connected NTC
+        <br>**0** = 10KΩ (Default)
+        <br>**1** = 12KΩ
+        <br>**2** = 15KΩ
+        <br>**3** = 22KΩ
+        <br>**4** = 33KΩ
+        <br>**5** = 47KΩ
+        <br>**6** = 6,8KΩ
+        <br>**7** = 100KΩ
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+      minimum: 0
+      maximum: 7
+      default: 0
+    internalMinimumTemperatureLimit:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Decides the lowest temperature allowed by the thermostat when using sensor mode A.
+        <br>Minimum: **5.0** = 5.0°C (Default)
+        <br>Maximum: **40.0** = 40.0°C
+      multipleOf: 0.5
+      default: 5.0
+      minimum: 5.0
+      maximum: 40.0
+    internalMaximumTemperatureLimit:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Decide the highest temperature allowed by the thermostat when using sensor mode A.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Maximum: **40.0** = 40.0°C (Default)
+      multipleOf: 0.5
+      default: 5.0
+      minimum: 5.0
+      maximum: 40.0
+    floorMinimumTemperatureLimit:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Devices the lowest temperature allowed by the thermostat when using sensor mode AF, F, A2F.
+        <br>Minimum: **5.0** = 5.0°C (Default)
+        <br>Maximum: **40.0** = 40.0°C
+      multipleOf: 0.5
+      minimum: 5.0
+      maximum: 40.0
+      default: 5.0
+    floorMaximumTemperatureLimit:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Decide the highest temperature allowed by the thermostat when using sensor mode AF, F, A2F.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Maximum: **40.0** = 40.0°C (Default)
+      multipleOf: 0.5
+      minimum: 5.0
+      maximum: 40.0
+      default: 40.0
+    externalMinimumTemperatureLimit:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Decide the lowest temperature allowed by the thermostat when using sensor mode A2.
+        <br>Minimum: **5.0** = 5.0°C (Default)
+        <br>Maximum: **40.0** = 40.0°C
+      multipleOf: 0.5
+      minimum: 5.0
+      maximum: 40.0
+      default: 5.0
+    externalMaximumTemperatureLimit:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Decide the highest temperature allowed by the thermostat when using sensor mode A2.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Maximum: **40.0** = 40.0°C (Default)
+      multipleOf: 0.5
+      minimum: 5.0
+      maximum: 40.0
+      default: 40.0
+    internalCalibration:
+      type: number
+      format: float
+      pattern: '^-?\d{1}\.\d{1}$'
+      description: >
+        Manually calibrate sensor A ±6°C
+        <br>Minimum: **-6.0** = -6.0°C
+        <br>Default: **0.0** = 0.0°C
+        <br>Maximum: **6.0** = +6.0°C
+      multipleOf: 0.1
+      minimum: -6.0
+      maximum: 6.0
+      default: 0.0
+    floorCalibration:
+      type: number
+      format: float
+      pattern: '^-?\d{1}\.\d{1}$'
+      description: >
+        Manually calibrate sensor F ±6°C
+        <br>Minimum: **-6.0** = -6.0°C
+        <br>Default: **0.0** = 0.0°C
+        <br>Maximum: **6.0** = +6.0°C
+      multipleOf: 0.1
+      minimum: -6.0
+      maximum: 6.0
+      default: 0.0
+    externalCalibration:
+      type: number
+      format: float
+      pattern: '^-?\d{1}\.\d{1}$'
+      description: >
+        Manually calibrate sensor A2 ±6°C
+        <br>Minimum: **-6.0** = -6.0°C
+        <br>Default: **0.0** = 0.0°C
+        <br>Maximum: **6.0** = +6.0°C
+      multipleOf: 0.1
+      minimum: -6.0
+      maximum: 6.0
+      default: 0.0
+    regulationMode:
+      type: boolean
+      description: >
+        Choose between regulation modes PWM and Hysteresis
+        <br>**false** = **0** = Hysteresis
+        <br>**true** = **1** = PWM
+      enum:
+        - false
+        - true
+        - 0
+        - 1
+      default: false
+    temperatureControlHysteresis:
+      type: number
+      format: float
+      pattern: '^\d{1}\.\d{1}$'
+      description: >
+        Choose the hysteresis used when regulation mode is set to HYST.
+        <br>Minimum: **0.3** = 0.3°C
+        <br>Default: **0.5** = 0.5°C
+        <br>Maximum: **3.0** = 3.0°C
+      multipleOf: 0.1
+      minimum: 0.3
+      maximum: 3.0
+      default: 0.5
+    temperatureDisplay:
+      type: boolean
+      description: >
+        Select what is shown on the display during Standby state
+        <br>**false** = **0** = Display setpoint
+        <br>**true** = **1** = Display measured temperature
+      enum:
+        - false
+        - true
+        - 0
+        - 1
+      default: false
+    activeDisplayBrightness:
+      type: integer
+      pattern: '^\d{1,2}$'
+      description: >
+        Configure the brightness of the display during active state.
+        <br>Minimum: **1** = 10%
+        <br>Maximum: **10** = 100% (Default)
+      minimum: 1
+      maximum: 10
+      default: 10
+    standbyDisplayBrightness:
+      type: integer
+      pattern: '^\d{1,2}$'
+      description: >
+        Configure the brightness of the display during standby state
+        <br>Minimum: **1** = 10%
+        <br>Default: **5** = 50%
+        <br>Maximum: **10** = 100%
+      minimum: 1
+      maximum: 10
+      default: 5
+    actionAfterError:
+      type: integer
+      pattern: '^\d{1,5}$'
+      description: >
+        Decide how the device should react when the overload / overheating features has turned OFF relay (Default 0)
+        <br>**0** = device will turn off and show an error in the display. (Default)
+        <br>**10 - 65535** = 10seconds - 65535seconds = device will attempt to turn on again after an error based on the delay specified.
+      minimum: 0
+      maximum: 65535
+      default: 0
+    heatingSetpoint:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Set setpoint for Heating mode (Default 21)
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Default: **21.0** = 21.0°C
+        <br>Maximum: **40.0** = 40.0°C
+      multipleOf: 0.5
+      minimum: 5.0
+      maximum: 40.0
+      default: 21.0
+    coolingSetpoint:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Set setpoint for Cooling mode.
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Default: **18.0** = 18.0°C
+        <br>Maximum: **40.0** = 40.0°C
+      multipleOf: 0.5
+      minimum: 5.0
+      maximum: 40.0
+      default: 18.0
+    ecoSetpoint:
+      type: number
+      format: float
+      pattern: '^\d{1,2}\.\d{1}$'
+      description: >
+        Set setpoint for ECO mode
+        <br>Minimum: **5.0** = 5.0°C
+        <br>Default: **18.0** = 18.0°C
+        <br>Maximum: **40.0** = 40.0°C
+      multipleOf: 0.5
+      minimum: 5.0
+      maximum: 40.0
+      default: 18.0
+    powerRegulatorActiveTime:
+      type: integer
+      pattern: '^\d{1,2}$'
+      description: >
+        Set the % of time the relay should be active when using PWER mode. (30-minute duty cycle) (Default 2)
+        <br>Minimum: **1** = 10% = 3 minutes on - 27 minutes off. 
+        <br>Default: **2** = 20% = 6 minutes on - 24 minutes off. 
+        <br>Maximum: **10** = 100%
+      minimum: 1
+      maximum: 10
+      default: 2
+    operatingMode:
+      type: integer
+      pattern: '^\d{1}$'
+      description: >
+        Set the thermostat mode
+        <br>**0** = OFF
+        <br>**1** = Heating mode (Default)
+        <br>**2** = Cooling mode
+        <br>**3** = ECO mode
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+      default: 1
+    openWindowDetection:
+      type: boolean
+      description: >
+        Choose to enable or disable the Open windows detection
+        <br>**false** = **0** = Open Window Detection is disabled. (Default)
+        <br>**true** = **1** = Open Window Detection is enabled.
+      enum:
+        - false
+        - true
+        - 0
+        - 1
+      default: false
+    sizeOfLoad:
+      type: integer
+      pattern: '^\d{1,2}$'
+      description: >
+        Allows the user to decide the power consumption of the connected load in 100W increments (Default 0)
+        <br>**0** = Uses power metering values. (Default)
+        <br>**1** - **99** = 100W - 9900W = Allows the user to set the size of the load, used when connected to a contactor
+      minimum: 0
+      maximum: 99
+      default: 0
+
+    ResetInfo:
+      type: object
+      properties:
+        statusSuccess:
+          type: string
+          enum:
+            - success
+          example: success

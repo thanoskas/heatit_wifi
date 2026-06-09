@@ -1,11 +1,12 @@
 {
-   "domain": "heatit_wifi6",
-   "name": "Heatit WiFi6 Thermostat",
-   "version": "0.9.4",
-   "config_flow": true,
-   "documentation": "https://github.com/mattik-gh/heatit_wifi6/",
-   "dependencies": ["network"],
-   "requirements": ["aiohttp"],
-   "codeowners": ["@mattik-gh"],
-   "iot_class": "local_polling"
+  "domain": "heatit_wifi6",
+  "name": "Heatit WiFi6 Thermostat",
+  "version": "1.1.2",
+  "config_flow": true,
+  "documentation": "https://github.com/mattik-gh/heatit_wifi6",
+  "dependencies": ["network"],
+  "requirements": ["aiohttp"],
+  "codeowners": ["@mattik-gh"],
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/mattik-gh/heatit_wifi6/issues"
 }
