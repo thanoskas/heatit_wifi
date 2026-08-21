@@ -1,0 +1,127 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Start Mock API
+        run: |
+          npx -y @stoplight/prism-cli mock custom_components/heatit_wifi6/docs/Heatit_WiFi6_OpenAPI_v70.yaml -p 4010 &
+          sleep 5
+
+      - name: Set up Home Assistant Config
+        run: |
+          mkdir -p ha_config/custom_components
+          cp -r custom_components/heatit_wifi6 ha_config/custom_components/
+          cat << 'CONF' > ha_config/configuration.yaml
+          default_config:
+          logger:
+            default: info
+            logs:
+              custom_components.heatit_wifi6: debug
+
+          automation:
+            - alias: "Test HVAC Mode on Startup"
+              trigger:
+                - platform: homeassistant
+                  event: start
+              action:
+                - delay: "00:00:10"
+                - service: climate.set_hvac_mode
+                  target:
+                    entity_id: climate.mocked_heatit_thermostat
+                  data:
+                    hvac_mode: heat
+          CONF
+
+      - name: Start Home Assistant Container
+        run: |
+          # Create an empty core.config_entries to inject our mock setup
+          mkdir -p ha_config/.storage
+          cat << 'ENTRIES' > ha_config/.storage/core.config_entries
+          {
+            "version": 1,
+            "minor_version": 4,
+            "key": "core.config_entries",
+            "data": {
+              "entries": [
+                {
+                  "entry_id": "e0b8a1c9d4f211ee9c270242ac120002",
+                  "version": 1,
+                  "minor_version": 1,
+                  "domain": "heatit_wifi6",
+                  "title": "Mocked Heatit Thermostat",
+                  "data": {
+                    "host": "http://127.0.0.1:4010",
+                    "name": "Mocked Heatit Thermostat"
+                  },
+                  "options": {},
+                  "pref_disable_new_entities": false,
+                  "pref_disable_polling": false,
+                  "source": "user",
+                  "unique_id": null,
+                  "disabled_by": null,
+                  "created_at": "2024-01-01T00:00:00.000000+00:00",
+                  "modified_at": "2024-01-01T00:00:00.000000+00:00",
+                  "discovery_keys": {}
+                }
+              ]
+            }
+          }
+          ENTRIES
+
+          cat << 'TRUSTED' >> ha_config/configuration.yaml
+          homeassistant:
+            auth_providers:
+              - type: trusted_networks
+                trusted_networks:
+                  - 127.0.0.0/8
+                  - ::1
+                  - fd00::/8
+                  - 172.16.0.0/12
+                  - 192.168.0.0/16
+                  - 10.0.0.0/8
+                allow_bypass_login: true
+          TRUSTED
+
+          # Start HA
+          docker run -d \
+            --name homeassistant \
+            --network host \
+            -v $(pwd)/ha_config:/config \
+            ghcr.io/home-assistant/home-assistant:stable
+
+          echo "Waiting for Home Assistant to start..."
+          # Wait up to 60s for HA to be responsive
+          for i in {1..12}; do
+            if curl -s http://localhost:8123/api/ > /dev/null; then
+              echo "Home Assistant is up!"
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install requests
+
+      - name: Run Integration Tests
+        run: python3 tests/test_integration.py

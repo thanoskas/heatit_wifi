@@ -48,33 +48,21 @@ paths:
     post:
       tags:
         - Parameters
-      description:  List of all parameters
-      parameters:
-        - $ref: '#/components/parameters/disableButtons'
-        - $ref: '#/components/parameters/sensorMode'
-        - $ref: '#/components/parameters/sensorValue'
-        - $ref: '#/components/parameters/internalMinimumTemperatureLimit'
-        - $ref: '#/components/parameters/internalMaximumTemperatureLimit'
-        - $ref: '#/components/parameters/floorMinimumTemperatureLimit'
-        - $ref: '#/components/parameters/floorMaximumTemperatureLimit'
-        - $ref: '#/components/parameters/externalMinimumTemperatureLimit'
-        - $ref: '#/components/parameters/externalMaximumTemperatureLimit'
-        - $ref: '#/components/parameters/internalCalibration'
-        - $ref: '#/components/parameters/floorCalibration'
-        - $ref: '#/components/parameters/externalCalibration'
-        - $ref: '#/components/parameters/regulationMode'
-        - $ref: '#/components/parameters/temperatureControlHysteresis'
-        - $ref: '#/components/parameters/temperatureDisplay'
-        - $ref: '#/components/parameters/activeDisplayBrightness'
-        - $ref: '#/components/parameters/standbyDisplayBrightness'
-        - $ref: '#/components/parameters/actionAfterError'
-        - $ref: '#/components/parameters/heatingSetpoint'
-        - $ref: '#/components/parameters/coolingSetpoint'
-        - $ref: '#/components/parameters/ecoSetpoint'
-        - $ref: '#/components/parameters/powerRegulatorActiveTime'
-        - $ref: '#/components/parameters/operatingMode'
-        - $ref: '#/components/parameters/openWindowDetection'
-        - $ref: '#/components/parameters/sizeOfLoad'
+      description: Update one or more thermostat parameters.
+      requestBody:
+        required: true
+        description: |
+          Object containing one or more parameter fields to update. Send only
+          the keys that should be changed; any subset of the response schema
+          properties below is accepted.
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              example:
+                operatingMode: 1
+                heatingSetpoint: 22.5
       responses:
         '200':
           description: Successful

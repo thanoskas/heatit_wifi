@@ -2,25 +2,66 @@
    "title": "Heatit WiFi6 Termostaatti",
    "config": {
       "error": {
-         "cannot_connect": "Yhteys epäonnistui. Tarkista osoite ja anna vain url-osoitteen perusosa, esim. http://192.168.10.5 ",
+         "cannot_connect": "Yhteys epäonnistui. Tarkista osoite ja anna vain url-osoitteen perusosa, esim. http://192.168.10.5",
          "unknown": "Tuntematon virhe."
+      },
+      "abort": {
+         "already_configured": "Tämä Heatit-laite on jo konfiguroitu."
       },
       "step": {
          "user": {
             "title": "Määritä Heatit WiFi6",
-            "description": "Anna termostaatille lyhyt nimi ja url osoitteen perusosa.",
+            "description": "Anna termostaatille lyhyt nimi ja URL-osoitteen perusosa.",
             "data": {
-               "name": "Nimi ",
-               "host": "Laitteen perus-URL. Esim. http://192.168.10.5 "
-            },
-            "add_device_done": "Termostaatti %s liästty ip-osoitteella: %s"
+               "name": "Nimi",
+               "host": "Laitteen perus-URL (esim. http://192.168.10.5)"
+            }
          }
       }
    },
-   "device": {
-      "name": "Termostaatti",
-      "temperature": "Lämpötila",
-      "target_temperature": "Asetuslämpötila",
-      "hvac_mode": "Laitteen tila"
+   "entity": {
+      "binary_sensor": {
+         "open_window_detected": {
+            "name": "Avoin ikkuna havaittu"
+         },
+         "open_window_detection_enabled": {
+            "name": "Avoimen ikkunan tunnistus"
+         }
+      },
+      "sensor": {
+         "current_temperature": {
+            "name": "Lämpötila"
+         },
+         "target_temperature": {
+            "name": "Asetuslämpötila"
+         },
+         "power": {
+            "name": "Teho"
+         },
+         "energy": {
+            "name": "Energia"
+         },
+         "internal_temperature": {
+            "name": "Sisäinen lämpötila"
+         },
+         "external_temperature": {
+            "name": "Ulkoinen lämpötila"
+         },
+         "floor_temperature": {
+            "name": "Lattialämpötila"
+         },
+         "heating_setpoint": {
+            "name": "Lämmityksen asetusarvo"
+         },
+         "cooling_setpoint": {
+            "name": "Jäähdytyksen asetusarvo"
+         },
+         "eco_setpoint": {
+            "name": "Eco-asetusarvo"
+         },
+         "wifi_signal_strength": {
+            "name": "WiFi-signaalin voimakkuus"
+         }
+      }
    }
 }
