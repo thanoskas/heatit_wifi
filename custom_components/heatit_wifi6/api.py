@@ -105,9 +105,13 @@ class HeatitWiFi6API:
             _LOGGER.error("Unknown reset_type: %s", reset_type)
             return {"status": "Failed", "detail": "Unknown reset_type."}
 
-        endpoint = f"{API_RESET}/{reset_type}"
+        # The API spec marks the "reset=reset" query param as required,
+        # as a guard against accidental resets.
+        endpoint = f"{API_RESET}/{reset_type}?reset=reset"
         response = await self._request("DELETE", endpoint)
-        if response.get("status") == "Success":
+        # The API spec documents the reset status as lowercase "success",
+        # while /api/parameters returns "Success" — accept either casing.
+        if str(response.get("status", "")).lower() == "success":
             _LOGGER.info("reset_device(%s) succeeded", reset_type)
             return response
         _LOGGER.error("reset_device(%s) failed: %s", reset_type, response)
