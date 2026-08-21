@@ -20,6 +20,11 @@
       }
    },
    "entity": {
+      "button": {
+         "reset_energy_meter": {
+            "name": "Reset energy meter"
+         }
+      },
       "binary_sensor": {
          "open_window_detected": {
             "name": "Open window detected"

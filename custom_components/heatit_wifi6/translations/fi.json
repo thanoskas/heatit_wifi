@@ -20,6 +20,11 @@
       }
    },
    "entity": {
+      "button": {
+         "reset_energy_meter": {
+            "name": "Nollaa energiamittari"
+         }
+      },
       "binary_sensor": {
          "open_window_detected": {
             "name": "Avoin ikkuna havaittu"
