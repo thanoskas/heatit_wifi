@@ -13,6 +13,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     CONF_NAME,
+    PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     EntityCategory,
     UnitOfEnergy,
@@ -80,6 +81,15 @@ def _wifi_signal(data: dict[str, Any]) -> int | None:
         return int(str(raw).removesuffix("dBm").strip())
     except ValueError:
         return None
+
+
+def _wifi_quality(data: dict[str, Any]) -> int | None:
+    # Human-friendly quality: the common linear RSSI mapping where
+    # -100 dBm -> 0 % and -50 dBm or better -> 100 %.
+    rssi = _wifi_signal(data)
+    if rssi is None:
+        return None
+    return max(0, min(100, 2 * (rssi + 100)))
 
 
 SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
@@ -178,6 +188,16 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         value_fn=_wifi_signal,
+    ),
+    HeatitWiFi6SensorEntityDescription(
+        key="wifi_signal_quality",
+        translation_key="wifi_signal_quality",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        icon="mdi:wifi",
+        value_fn=_wifi_quality,
     ),
 )
 

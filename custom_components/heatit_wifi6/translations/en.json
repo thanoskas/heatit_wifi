@@ -139,6 +139,9 @@
          },
          "wifi_signal_strength": {
             "name": "WiFi signal strength"
+         },
+         "wifi_signal_quality": {
+            "name": "WiFi signal quality"
          }
       }
    }
