@@ -25,6 +25,20 @@
             "name": "Reset energy meter"
          }
       },
+      "select": {
+         "sensor_mode": {
+            "name": "Sensor mode",
+            "state": {
+               "floor": "Floor sensor (F)",
+               "internal": "Internal sensor (A)",
+               "internal_floor_limit": "Internal + floor limit (AF)",
+               "external": "External sensor (A2)",
+               "external_floor_limit": "External + floor limit (A2F)",
+               "power_regulator": "Power regulator (PWER)",
+               "relay": "Relay (RELA, WiFi7 only)"
+            }
+         }
+      },
       "number": {
          "hysteresis": {
             "name": "Hysteresis"

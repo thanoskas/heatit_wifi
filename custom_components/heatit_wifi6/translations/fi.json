@@ -25,6 +25,20 @@
             "name": "Nollaa energiamittari"
          }
       },
+      "select": {
+         "sensor_mode": {
+            "name": "Anturitila",
+            "state": {
+               "floor": "Lattia-anturi (F)",
+               "internal": "Sisäinen anturi (A)",
+               "internal_floor_limit": "Sisäinen + lattiarajoitus (AF)",
+               "external": "Ulkoinen anturi (A2)",
+               "external_floor_limit": "Ulkoinen + lattiarajoitus (A2F)",
+               "power_regulator": "Tehonsäädin (PWER)",
+               "relay": "Rele (RELA, vain WiFi7)"
+            }
+         }
+      },
       "number": {
          "hysteresis": {
             "name": "Hystereesi"
