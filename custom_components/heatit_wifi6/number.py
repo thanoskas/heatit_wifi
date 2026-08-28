@@ -209,7 +209,11 @@ class HeatitWiFi6Number(HeatitWiFi6Entity, NumberEntity):
             raise HomeAssistantError(
                 f"Failed to set {parameter} to {payload} on the Heatit thermostat"
             )
+        # Update the shared cache and notify all entities; skip the
+        # immediate readback since the firmware's status can lag the
+        # write (the next scheduled poll confirms the value).
         if data := self.coordinator.data:
             data.setdefault("parameters", {})[parameter] = payload
-            self.async_write_ha_state()
-        await self.coordinator.async_request_refresh()
+            self.coordinator.async_set_updated_data(data)
+        else:
+            await self.coordinator.async_request_refresh()

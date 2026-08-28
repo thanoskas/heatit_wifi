@@ -154,15 +154,18 @@ class HeatitWiFi6Switch(HeatitWiFi6Entity, SwitchEntity):
                 f"Failed to set {description.parameter} to {payload}"
                 " on the Heatit thermostat"
             )
-        # Reflect the change immediately; the (debounced) refresh only
-        # confirms it later.
+        # Push the new value into the shared cache and notify every
+        # entity. Deliberately no immediate refresh: /api/status can
+        # still report the old value right after a write, which would
+        # revert the UI; the next scheduled poll confirms instead.
         if data := self.coordinator.data:
             if description.set_local is not None:
                 description.set_local(data, payload)
             else:
                 data.setdefault("parameters", {})[description.parameter] = payload
-            self.async_write_ha_state()
-        await self.coordinator.async_request_refresh()
+            self.coordinator.async_set_updated_data(data)
+        else:
+            await self.coordinator.async_request_refresh()
 
 
 class HeatitWiFi6RelaySwitch(HeatitWiFi6Entity, SwitchEntity):
@@ -219,5 +222,6 @@ class HeatitWiFi6RelaySwitch(HeatitWiFi6Entity, SwitchEntity):
         if data := self.coordinator.data:
             data.setdefault("parameters", {})["onOff"] = value
             data["state"] = "closed" if value else "open"
-            self.async_write_ha_state()
-        await self.coordinator.async_request_refresh()
+            self.coordinator.async_set_updated_data(data)
+        else:
+            await self.coordinator.async_request_refresh()

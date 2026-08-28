@@ -176,21 +176,19 @@ class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
             return
 
         if await self._api.set_parameter(param, temperature):
-            params = self.coordinator.data.setdefault("parameters", {})
-            params[param] = temperature
-            self.async_write_ha_state()
-            await self.coordinator.async_request_refresh()
+            self._apply_local(param, temperature)
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Switch between eco and normal heating modes."""
         if preset_mode == PRESET_ECO:
-            await self._api.set_parameter("operatingMode", OPERATING_MODE_ECO)
+            operating_mode = OPERATING_MODE_ECO
         elif preset_mode in (PRESET_NONE, None):
-            await self._api.set_parameter("operatingMode", OPERATING_MODE_HEAT)
+            operating_mode = OPERATING_MODE_HEAT
         else:
             _LOGGER.warning("Unsupported preset_mode: %s", preset_mode)
             return
-        await self.coordinator.async_request_refresh()
+        if await self._api.set_parameter("operatingMode", operating_mode):
+            self._apply_local("operatingMode", operating_mode)
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set the device's HVAC mode."""
@@ -199,7 +197,19 @@ class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
             _LOGGER.error("Unsupported HVACMode: %s", hvac_mode)
             return
         if await self._api.set_parameter("operatingMode", operating_mode):
-            await self.coordinator.async_request_refresh()
+            self._apply_local("operatingMode", operating_mode)
+
+    def _apply_local(self, parameter: str, value: Any) -> None:
+        """Apply a freshly written parameter to the shared status cache.
+
+        Notifies every entity of the coordinator. Deliberately no
+        immediate readback: /api/status can still report the old value
+        right after a write, which would revert the UI; the next
+        scheduled poll confirms the change instead.
+        """
+        if data := self.coordinator.data:
+            data.setdefault("parameters", {})[parameter] = value
+            self.coordinator.async_set_updated_data(data)
 
     @staticmethod
     def _hvac_mode_to_heatit_operatingmode(mode: HVACMode) -> int | None:

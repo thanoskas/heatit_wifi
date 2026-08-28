@@ -79,10 +79,14 @@ class HeatitWiFi6SensorModeSelect(HeatitWiFi6Entity, SelectEntity):
             raise HomeAssistantError(
                 f"Failed to set sensorMode to {mode} on the Heatit thermostat"
             )
+        # Update the shared cache and notify all entities (climate and
+        # the relay switch depend on sensorMode); no immediate readback
+        # since the firmware's status can lag the write.
         if data := self.coordinator.data:
             data.setdefault("parameters", {})["sensorMode"] = mode
-            self.async_write_ha_state()
-        await self.coordinator.async_request_refresh()
+            self.coordinator.async_set_updated_data(data)
+        else:
+            await self.coordinator.async_request_refresh()
 
 
 class HeatitWiFi6RegulationModeSelect(HeatitWiFi6Entity, SelectEntity):
@@ -122,5 +126,6 @@ class HeatitWiFi6RegulationModeSelect(HeatitWiFi6Entity, SelectEntity):
             )
         if data := self.coordinator.data:
             data.setdefault("parameters", {})["regulationMode"] = value
-            self.async_write_ha_state()
-        await self.coordinator.async_request_refresh()
+            self.coordinator.async_set_updated_data(data)
+        else:
+            await self.coordinator.async_request_refresh()
