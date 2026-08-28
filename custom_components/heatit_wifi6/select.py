@@ -79,4 +79,7 @@ class HeatitWiFi6SensorModeSelect(HeatitWiFi6Entity, SelectEntity):
             raise HomeAssistantError(
                 f"Failed to set sensorMode to {mode} on the Heatit thermostat"
             )
+        if data := self.coordinator.data:
+            data.setdefault("parameters", {})["sensorMode"] = mode
+            self.async_write_ha_state()
         await self.coordinator.async_request_refresh()

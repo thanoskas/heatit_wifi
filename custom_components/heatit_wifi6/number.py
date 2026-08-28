@@ -50,8 +50,12 @@ def _calibration(key: str, parameter: str) -> HeatitWiFi6NumberEntityDescription
     )
 
 
+BRIGHTNESS_KEYS = {"active_display_brightness", "standby_display_brightness"}
+
+
 def _brightness(key: str, parameter: str) -> HeatitWiFi6NumberEntityDescription:
-    # 1-10 maps to 10%-100% display brightness on the device.
+    # WiFi6 uses a 1-10 scale (x10%); WiFi7 firmware reports 0-100 in
+    # steps of 10. The entity switches scale based on the reported value.
     return HeatitWiFi6NumberEntityDescription(
         key=key,
         translation_key=key,
@@ -131,13 +135,36 @@ class HeatitWiFi6Number(HeatitWiFi6Entity, NumberEntity):
             return None
         return self.entity_description.value_fn(data)
 
+    def _percent_scale(self) -> bool:
+        """True when this is a brightness on the WiFi7's 0-100 scale."""
+        if self.entity_description.key not in BRIGHTNESS_KEYS:
+            return False
+        value = self.native_value
+        return value is not None and value > 10
+
+    @property
+    def native_min_value(self) -> float:
+        return 0 if self._percent_scale() else super().native_min_value
+
+    @property
+    def native_max_value(self) -> float:
+        return 100 if self._percent_scale() else super().native_max_value
+
+    @property
+    def native_step(self) -> float | None:
+        return 10 if self._percent_scale() else super().native_step
+
     async def async_set_native_value(self, value: float) -> None:
         """Write the new value to the device."""
         parameter = self.entity_description.parameter
         # The brightness parameters are integers in the API.
-        payload: float | int = int(value) if self.entity_description.native_step == 1 else round(value, 1)
+        step = self.native_step
+        payload: float | int = int(value) if step and step >= 1 else round(value, 1)
         if not await self._api.set_parameter(parameter, payload):
             raise HomeAssistantError(
                 f"Failed to set {parameter} to {payload} on the Heatit thermostat"
             )
+        if data := self.coordinator.data:
+            data.setdefault("parameters", {})[parameter] = payload
+            self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
