@@ -25,6 +25,26 @@
             "name": "Nollaa energiamittari"
          }
       },
+      "number": {
+         "hysteresis": {
+            "name": "Hystereesi"
+         },
+         "active_display_brightness": {
+            "name": "Näytön kirkkaus (aktiivinen)"
+         },
+         "standby_display_brightness": {
+            "name": "Näytön kirkkaus (valmiustila)"
+         },
+         "internal_calibration": {
+            "name": "Sisäisen anturin kalibrointi"
+         },
+         "floor_calibration": {
+            "name": "Lattia-anturin kalibrointi"
+         },
+         "external_calibration": {
+            "name": "Ulkoisen anturin kalibrointi"
+         }
+      },
       "switch": {
          "temperature_display": {
             "name": "Näytä mitattu lämpötila"

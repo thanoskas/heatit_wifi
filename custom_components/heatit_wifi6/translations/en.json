@@ -25,6 +25,26 @@
             "name": "Reset energy meter"
          }
       },
+      "number": {
+         "hysteresis": {
+            "name": "Hysteresis"
+         },
+         "active_display_brightness": {
+            "name": "Active display brightness"
+         },
+         "standby_display_brightness": {
+            "name": "Standby display brightness"
+         },
+         "internal_calibration": {
+            "name": "Internal sensor calibration"
+         },
+         "floor_calibration": {
+            "name": "Floor sensor calibration"
+         },
+         "external_calibration": {
+            "name": "External sensor calibration"
+         }
+      },
       "switch": {
          "temperature_display": {
             "name": "Display measured temperature"
