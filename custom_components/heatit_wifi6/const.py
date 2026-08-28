@@ -6,6 +6,9 @@ DOMAIN: Final = "heatit_wifi6"
 # Status polling interval in minutes.
 POLL_INTERVAL: Final = 1
 
+# Default polling interval in seconds (overridable via the options flow).
+DEFAULT_SCAN_INTERVAL: Final = POLL_INTERVAL * 60
+
 # The firmware reports exactly 100.0 for a disconnected or shorted
 # floor/external NTC sensor; treat that reading as "no sensor".
 NTC_FAULT_TEMPERATURE: Final = 100.0

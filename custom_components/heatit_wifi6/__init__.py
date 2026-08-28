@@ -7,14 +7,14 @@ from datetime import timedelta
 from typing import Any, TypeAlias
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, Platform
+from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import HeatitWiFi6API
-from .const import DOMAIN, POLL_INTERVAL
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,12 +66,13 @@ async def async_setup_entry(
             raise UpdateFailed("Failed to fetch data from Heatit WiFi6 thermostat")
         return data
 
+    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     coordinator: DataUpdateCoordinator[dict[str, Any]] = DataUpdateCoordinator(
         hass,
         _LOGGER,
         name=DOMAIN,
         update_method=async_update_data,
-        update_interval=timedelta(minutes=POLL_INTERVAL),
+        update_interval=timedelta(seconds=scan_interval),
     )
 
     await coordinator.async_config_entry_first_refresh()
@@ -83,7 +84,15 @@ async def async_setup_entry(
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    entry.async_on_unload(entry.add_update_listener(_async_options_updated))
     return True
+
+
+async def _async_options_updated(
+    hass: HomeAssistant, entry: HeatitWiFi6ConfigEntry
+) -> None:
+    """Reload the entry when options (or the host) change."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(

@@ -19,6 +19,21 @@
          }
       }
    },
+   "options": {
+      "error": {
+         "cannot_connect": "Yhteys epäonnistui. Tarkista osoite ja anna vain url-osoitteen perusosa, esim. http://192.168.10.5",
+         "different_device": "Osoite viittaa eri Heatit-laitteeseen. Vaihda termostaatti poistamalla ja lisäämällä integraatio uudelleen."
+      },
+      "step": {
+         "init": {
+            "title": "Heatit WiFi6 -asetukset",
+            "data": {
+               "host": "Laitteen perus-URL (esim. http://192.168.10.5)",
+               "scan_interval": "Päivitysväli (sekuntia)"
+            }
+         }
+      }
+   },
    "entity": {
       "button": {
          "reset_energy_meter": {
