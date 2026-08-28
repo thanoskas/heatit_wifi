@@ -93,6 +93,17 @@ class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
         return data.get("parameters") or {}
 
     @property
+    def available(self) -> bool:
+        """Unavailable while a WiFi7 runs in Relay mode (sensorMode 7).
+
+        In that mode the device is a plain on/off relay (see the relay
+        switch entity) and the thermostat semantics don't apply.
+        """
+        if not super().available:
+            return False
+        return self._parameters().get("sensorMode") != 7
+
+    @property
     def current_temperature(self) -> float | None:
         """Return current temperature, picked according to active sensor mode."""
         data = self.coordinator.data
@@ -219,5 +230,8 @@ class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
             return HVACAction.HEATING
         if state == "Cooling":
             return HVACAction.COOLING
+        if state in ("Open", "Closed"):
+            # WiFi7 Relay mode; the climate entity is unavailable then.
+            return None
         _LOGGER.error("Unknown state from Heatit: %s", state)
         return None

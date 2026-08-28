@@ -80,12 +80,23 @@ async def async_setup_entry(
     """Set up the Heatit WiFi6 switches from a config entry."""
     data = entry.runtime_data
     name = entry.data[CONF_NAME]
-    async_add_entities(
+    entities: list[SwitchEntity] = [
         HeatitWiFi6Switch(
             data.coordinator, data.api, name, data.device_id, description
         )
         for description in SWITCH_DESCRIPTIONS
-    )
+    ]
+
+    # The relay on/off control only exists on the WiFi7 (which reports a
+    # model field in /api/status). It stays unavailable until the device
+    # is put in Relay mode (sensorMode 7).
+    status = data.coordinator.data or {}
+    if status.get("model") or (status.get("parameters") or {}).get("sensorMode") == 7:
+        entities.append(
+            HeatitWiFi6RelaySwitch(data.coordinator, data.api, name, data.device_id)
+        )
+
+    async_add_entities(entities)
 
 
 class HeatitWiFi6Switch(HeatitWiFi6Entity, SwitchEntity):
@@ -127,5 +138,57 @@ class HeatitWiFi6Switch(HeatitWiFi6Entity, SwitchEntity):
         if not await self._api.set_parameter(parameter, value):
             raise HomeAssistantError(
                 f"Failed to set {parameter} to {value} on the Heatit thermostat"
+            )
+        await self.coordinator.async_request_refresh()
+
+
+class HeatitWiFi6RelaySwitch(HeatitWiFi6Entity, SwitchEntity):
+    """The relay output of a WiFi7 running in Relay mode (RELA)."""
+
+    _attr_translation_key = "relay"
+    _attr_device_class = SwitchDeviceClass.SWITCH
+
+    def __init__(
+        self,
+        coordinator,
+        api: HeatitWiFi6API,
+        device_name: str,
+        device_id: str,
+    ) -> None:
+        """Initialize the relay switch."""
+        super().__init__(coordinator, device_name, device_id)
+        self._api = api
+        self._attr_unique_id = f"heatit_wifi6_{device_id}_relay"
+
+    @property
+    def available(self) -> bool:
+        """Only usable while the device is in Relay mode."""
+        if not super().available:
+            return False
+        data = self.coordinator.data or {}
+        return (data.get("parameters") or {}).get("sensorMode") == 7
+
+    @property
+    def is_on(self) -> bool | None:
+        data = self.coordinator.data or {}
+        # Prefer the live relay state; fall back to the onOff parameter.
+        state = data.get("state")
+        if state in ("Open", "Closed"):
+            return state == "Closed"
+        value = (data.get("parameters") or {}).get("onOff")
+        return None if value is None else bool(value)
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Close the relay."""
+        await self._async_set(True)
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Open the relay."""
+        await self._async_set(False)
+
+    async def _async_set(self, value: bool) -> None:
+        if not await self._api.set_parameter("onOff", value):
+            raise HomeAssistantError(
+                f"Failed to set onOff to {value} on the Heatit relay"
             )
         await self.coordinator.async_request_refresh()

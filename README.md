@@ -13,7 +13,7 @@ This software is a third-party integration and is not affiliated with, maintaine
 ### WiFi7 compatibility notes
 The WiFi7 exposes the same local HTTP API as the WiFi6 (`/api/status`, `/api/parameters`, `/api/reset/...`), so all entities of this integration work on both models. Additionally:
 * The WiFi7 reports a `model` field in `/api/status`; the device page shows the correct model automatically (WiFi6 devices fall back to "WiFi6 Thermostat").
-* The WiFi7 adds a Relay sensor mode (RELA) — available in the sensor mode select; selecting it on a WiFi6 is rejected by the device.
+* The WiFi7 adds a Relay sensor mode (RELA) — available in the sensor mode select; selecting it on a WiFi6 is rejected by the device. While in Relay mode, a "Relay" switch entity controls the output (`onOff` parameter) and the climate entity becomes unavailable (the device is a plain on/off relay then).
 * WiFi7-only features (BlueFusion BLE devices, DirectLink, `externalSensorFallback`) are not yet supported by this integration.
 
 ## Installation
@@ -49,6 +49,7 @@ The WiFi7 exposes the same local HTTP API as the WiFi6 (`/api/status`, `/api/par
     * WiFi signal strength (diagnostic)
 * **Binary sensors:** Open window detected, and open window detection enabled (diagnostic).
 * **Switches (configuration):** Display measured temperature (instead of the setpoint, on the standby screen), child lock, and open window detection.
+* **Relay switch (WiFi7 only):** Controls the output when the device runs in Relay mode; unavailable in the thermostat modes.
 * **Button (configuration):** Reset energy meter (kWh).
 * **Numbers (configuration, disabled by default):** Hysteresis, active/standby display brightness, and internal/floor/external sensor calibration.
 * **Select (configuration, disabled by default):** Sensor mode (Floor / Internal / AF / External / A2F / Power regulator / Relay*).
@@ -68,6 +69,7 @@ The WiFi7 exposes the same local HTTP API as the WiFi6 (`/api/status`, `/api/par
     * New configuration switches: display measured temperature, child lock, open window detection.
     * New configuration numbers (disabled by default): hysteresis, display brightness (active/standby), sensor calibration (internal/floor/external).
     * New sensor mode select (disabled by default), including the WiFi7-only Relay mode.
+    * New Relay switch for WiFi7 devices in Relay mode (`onOff` parameter); the climate entity is unavailable while in that mode.
     * WiFi signal strength is now a numeric dBm sensor (device class `signal_strength`).
     * Disconnected NTC sensors (100.0 °C sentinel) now show as unavailable.
     * New options flow: polling interval (10–3600 s) and host/IP change without re-adding the device.

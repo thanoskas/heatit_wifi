@@ -83,6 +83,9 @@
          },
          "open_window_detection": {
             "name": "Open window detection"
+         },
+         "relay": {
+            "name": "Relay"
          }
       },
       "binary_sensor": {

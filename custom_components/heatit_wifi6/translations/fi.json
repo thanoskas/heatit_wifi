@@ -83,6 +83,9 @@
          },
          "open_window_detection": {
             "name": "Avoimen ikkunan tunnistus"
+         },
+         "relay": {
+            "name": "Rele"
          }
       },
       "binary_sensor": {
