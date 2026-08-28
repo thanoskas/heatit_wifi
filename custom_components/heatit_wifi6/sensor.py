@@ -13,6 +13,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     CONF_NAME,
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
@@ -57,8 +58,16 @@ def _target_temperature(data: dict[str, Any]) -> float | None:
     return None
 
 
-def _wifi_signal(data: dict[str, Any]) -> str | None:
-    return (data.get("network") or {}).get("wifiSignalStrength")
+def _wifi_signal(data: dict[str, Any]) -> int | None:
+    # The device reports the RSSI as a string like "-37dBm"; strip the
+    # unit suffix so the sensor can be numeric (graphs, alerts).
+    raw = (data.get("network") or {}).get("wifiSignalStrength")
+    if raw is None:
+        return None
+    try:
+        return int(str(raw).removesuffix("dBm").strip())
+    except ValueError:
+        return None
 
 
 SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
@@ -151,6 +160,9 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
     HeatitWiFi6SensorEntityDescription(
         key="wifi_signal_strength",
         translation_key="wifi_signal_strength",
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         value_fn=_wifi_signal,
