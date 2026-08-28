@@ -11,7 +11,12 @@ from homeassistant.components.number import (
     NumberEntityDescription,
     NumberMode,
 )
-from homeassistant.const import CONF_NAME, EntityCategory, UnitOfTemperature
+from homeassistant.const import (
+    CONF_NAME,
+    PERCENTAGE,
+    EntityCategory,
+    UnitOfTemperature,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -27,13 +32,30 @@ class HeatitWiFi6NumberEntityDescription(NumberEntityDescription):
 
     parameter: str
     value_fn: Callable[[dict[str, Any]], float | None]
+    # The WiFi7 renamed some parameters (e.g. internalCalibration ->
+    # internalSensorCalibration); when set, reads accept either name and
+    # writes use whichever the device actually reports.
+    alt_parameter: str | None = None
 
 
 def _parameter_field(name: str) -> Callable[[dict[str, Any]], float | None]:
     return lambda data: (data.get("parameters") or {}).get(name)
 
 
-def _calibration(key: str, parameter: str) -> HeatitWiFi6NumberEntityDescription:
+def _dual_parameter_field(
+    primary: str, alt: str
+) -> Callable[[dict[str, Any]], float | None]:
+    def _value(data: dict[str, Any]) -> float | None:
+        params = data.get("parameters") or {}
+        value = params.get(primary)
+        return params.get(alt) if value is None else value
+
+    return _value
+
+
+def _calibration(
+    key: str, parameter: str, alt_parameter: str
+) -> HeatitWiFi6NumberEntityDescription:
     return HeatitWiFi6NumberEntityDescription(
         key=key,
         translation_key=key,
@@ -46,7 +68,8 @@ def _calibration(key: str, parameter: str) -> HeatitWiFi6NumberEntityDescription
         native_step=0.1,
         mode=NumberMode.BOX,
         parameter=parameter,
-        value_fn=_parameter_field(parameter),
+        alt_parameter=alt_parameter,
+        value_fn=_dual_parameter_field(parameter, alt_parameter),
     )
 
 
@@ -87,9 +110,22 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFi6NumberEntityDescription, ...] = (
     ),
     _brightness("active_display_brightness", "activeDisplayBrightness"),
     _brightness("standby_display_brightness", "standbyDisplayBrightness"),
-    _calibration("internal_calibration", "internalCalibration"),
-    _calibration("floor_calibration", "floorCalibration"),
-    _calibration("external_calibration", "externalCalibration"),
+    _calibration("internal_calibration", "internalCalibration", "internalSensorCalibration"),
+    _calibration("floor_calibration", "floorCalibration", "floorSensorCalibration"),
+    _calibration("external_calibration", "externalCalibration", "externalSensorCalibration"),
+    HeatitWiFi6NumberEntityDescription(
+        key="power_regulator_active_time",
+        translation_key="power_regulator_active_time",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+        native_unit_of_measurement=PERCENTAGE,
+        native_min_value=10,
+        native_max_value=100,
+        native_step=1,
+        mode=NumberMode.SLIDER,
+        parameter="powerRegulatorActiveTime",
+        value_fn=_parameter_field("powerRegulatorActiveTime"),
+    ),
 )
 
 
@@ -154,9 +190,18 @@ class HeatitWiFi6Number(HeatitWiFi6Entity, NumberEntity):
     def native_step(self) -> float | None:
         return 10 if self._percent_scale() else super().native_step
 
+    def _api_parameter(self) -> str:
+        """Return the parameter name this device actually uses."""
+        description = self.entity_description
+        if description.alt_parameter:
+            params = (self.coordinator.data or {}).get("parameters") or {}
+            if description.parameter not in params and description.alt_parameter in params:
+                return description.alt_parameter
+        return description.parameter
+
     async def async_set_native_value(self, value: float) -> None:
         """Write the new value to the device."""
-        parameter = self.entity_description.parameter
+        parameter = self._api_parameter()
         # The brightness parameters are integers in the API.
         step = self.native_step
         payload: float | int = int(value) if step and step >= 1 else round(value, 1)

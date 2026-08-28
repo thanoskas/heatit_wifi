@@ -52,6 +52,13 @@
                "power_regulator": "Tehonsäädin (PWER)",
                "relay": "Rele (RELA, vain WiFi7)"
             }
+         },
+         "regulation_mode": {
+            "name": "Säätötapa",
+            "state": {
+               "hysteresis": "Hystereesi (HYST)",
+               "pwm": "PWM"
+            }
          }
       },
       "number": {
@@ -72,6 +79,9 @@
          },
          "external_calibration": {
             "name": "Ulkoisen anturin kalibrointi"
+         },
+         "power_regulator_active_time": {
+            "name": "Tehonsäätimen aktiiviaika"
          }
       },
       "switch": {

@@ -52,6 +52,13 @@
                "power_regulator": "Power regulator (PWER)",
                "relay": "Relay (RELA, WiFi7 only)"
             }
+         },
+         "regulation_mode": {
+            "name": "Regulation mode",
+            "state": {
+               "hysteresis": "Hysteresis (HYST)",
+               "pwm": "PWM"
+            }
          }
       },
       "number": {
@@ -72,6 +79,9 @@
          },
          "external_calibration": {
             "name": "External sensor calibration"
+         },
+         "power_regulator_active_time": {
+            "name": "Power regulator active time"
          }
       },
       "switch": {
