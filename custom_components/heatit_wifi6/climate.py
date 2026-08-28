@@ -19,6 +19,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import HeatitWiFi6ConfigEntry
 from .api import HeatitWiFi6API
+from .const import NTC_FAULT_TEMPERATURE
 from .entity import HeatitWiFi6Entity
 
 _LOGGER = logging.getLogger(__name__)
@@ -99,10 +100,13 @@ class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
             return None
         sensor_mode = self._parameters().get("sensorMode")
         if sensor_mode == 0:
-            return data.get("floorTemperature")
-        if sensor_mode in (3, 4):
-            return data.get("externalTemperature")
-        return data.get("internalTemperature")
+            value = data.get("floorTemperature")
+        elif sensor_mode in (3, 4):
+            value = data.get("externalTemperature")
+        else:
+            return data.get("internalTemperature")
+        # Disconnected NTC sensors read exactly 100.0; hide that.
+        return None if value == NTC_FAULT_TEMPERATURE else value
 
     @property
     def target_temperature(self) -> float | None:

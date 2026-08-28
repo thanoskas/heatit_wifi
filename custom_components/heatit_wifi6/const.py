@@ -6,6 +6,10 @@ DOMAIN: Final = "heatit_wifi6"
 # Status polling interval in minutes.
 POLL_INTERVAL: Final = 1
 
+# The firmware reports exactly 100.0 for a disconnected or shorted
+# floor/external NTC sensor; treat that reading as "no sensor".
+NTC_FAULT_TEMPERATURE: Final = 100.0
+
 # API endpoints.
 API_STATUS: Final = "/api/status"
 API_PARAMETERS: Final = "/api/parameters"

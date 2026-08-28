@@ -23,6 +23,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import HeatitWiFi6ConfigEntry
+from .const import NTC_FAULT_TEMPERATURE
 from .entity import HeatitWiFi6Entity
 
 
@@ -37,12 +38,19 @@ def _param(name: str) -> Callable[[dict[str, Any]], Any]:
     return lambda data: (data.get("parameters") or {}).get(name)
 
 
+def _ntc_temperature(data: dict[str, Any], field: str) -> float | None:
+    value = data.get(field)
+    if value == NTC_FAULT_TEMPERATURE:
+        return None
+    return value
+
+
 def _current_temperature(data: dict[str, Any]) -> float | None:
     sensor_mode = (data.get("parameters") or {}).get("sensorMode")
     if sensor_mode == 0:
-        return data.get("floorTemperature")
+        return _ntc_temperature(data, "floorTemperature")
     if sensor_mode in (3, 4):
-        return data.get("externalTemperature")
+        return _ntc_temperature(data, "externalTemperature")
     return data.get("internalTemperature")
 
 
@@ -119,7 +127,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
-        value_fn=lambda data: data.get("externalTemperature"),
+        value_fn=lambda data: _ntc_temperature(data, "externalTemperature"),
     ),
     HeatitWiFi6SensorEntityDescription(
         key="floor_temperature",
@@ -128,7 +136,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=False,
-        value_fn=lambda data: data.get("floorTemperature"),
+        value_fn=lambda data: _ntc_temperature(data, "floorTemperature"),
     ),
     HeatitWiFi6SensorEntityDescription(
         key="heating_setpoint",
