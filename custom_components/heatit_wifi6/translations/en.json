@@ -25,6 +25,17 @@
             "name": "Reset energy meter"
          }
       },
+      "switch": {
+         "temperature_display": {
+            "name": "Display measured temperature"
+         },
+         "child_lock": {
+            "name": "Child lock"
+         },
+         "open_window_detection": {
+            "name": "Open window detection"
+         }
+      },
       "binary_sensor": {
          "open_window_detected": {
             "name": "Open window detected"

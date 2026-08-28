@@ -25,6 +25,17 @@
             "name": "Nollaa energiamittari"
          }
       },
+      "switch": {
+         "temperature_display": {
+            "name": "Näytä mitattu lämpötila"
+         },
+         "child_lock": {
+            "name": "Lapsilukko"
+         },
+         "open_window_detection": {
+            "name": "Avoimen ikkunan tunnistus"
+         }
+      },
       "binary_sensor": {
          "open_window_detected": {
             "name": "Avoin ikkuna havaittu"
