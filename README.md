@@ -8,6 +8,13 @@ This software is a third-party integration and is not affiliated with, maintaine
 
 ## Supported Devices
 * Heatit WiFi6 Thermostat (Firmware v2.20 and newer)
+* Heatit WiFi7 Thermostat (tested on firmware 0.1.13 — note the WiFi7 firmware numbering starts at 0.x)
+
+### WiFi7 compatibility notes
+The WiFi7 exposes the same local HTTP API as the WiFi6 (`/api/status`, `/api/parameters`, `/api/reset/...`), so all entities of this integration work on both models. Additionally:
+* The WiFi7 reports a `model` field in `/api/status`; the device page shows the correct model automatically (WiFi6 devices fall back to "WiFi6 Thermostat").
+* The WiFi7 adds a Relay sensor mode (RELA) — available in the sensor mode select; selecting it on a WiFi6 is rejected by the device.
+* WiFi7-only features (BlueFusion BLE devices, DirectLink, `externalSensorFallback`) are not yet supported by this integration.
 
 ## Installation
 
@@ -41,12 +48,30 @@ This software is a third-party integration and is not affiliated with, maintaine
     * Heating, cooling, and eco setpoints (diagnostic)
     * WiFi signal strength (diagnostic)
 * **Binary sensors:** Open window detected, and open window detection enabled (diagnostic).
+* **Switches (configuration):** Display measured temperature (instead of the setpoint, on the standby screen), child lock, and open window detection.
+* **Button (configuration):** Reset energy meter (kWh).
+* **Numbers (configuration, disabled by default):** Hysteresis, active/standby display brightness, and internal/floor/external sensor calibration.
+* **Select (configuration, disabled by default):** Sensor mode (Floor / Internal / AF / External / A2F / Power regulator / Relay*).
+* **Faulty sensor handling:** A disconnected floor/external NTC sensor (reported as exactly 100.0 °C by the firmware) shows as unavailable instead of 100 °C.
 * **Device page:** Each thermostat is linked to its web UI via the `Visit` button (uses the device's local IP) and shows the WiFi MAC under connections.
-* **Polling:** Local polling once per minute.
+* **Polling:** Local polling, once per minute by default — configurable (10–3600 s) via the integration's options. The options also allow changing the device's address (e.g. after a new DHCP lease) without re-adding it.
+* **Diagnostics:** Download a redacted `/api/status` dump from the device page for bug reports.
 * **Advanced control:** Parameters can be changed via HTTP POST to `/api/parameters` on the device. See the OpenAPI documentation in the `docs` folder.
-* **Energy meter:** Reset the kWh meter by sending a DELETE request to `/api/reset/kwh` on the device.
+
+\* Relay mode exists on the WiFi7 only.
 
 ## Version History
+* **1.4.0**
+    * WiFi7 support: confirmed working on real hardware; the device model is now read from the API (`model` field), so WiFi7 units are labeled correctly.
+    * Fixed `DELETE /api/reset/{type}` to send the spec-required `?reset=reset` query parameter.
+    * New "Reset energy meter" button.
+    * New configuration switches: display measured temperature, child lock, open window detection.
+    * New configuration numbers (disabled by default): hysteresis, display brightness (active/standby), sensor calibration (internal/floor/external).
+    * New sensor mode select (disabled by default), including the WiFi7-only Relay mode.
+    * WiFi signal strength is now a numeric dBm sensor (device class `signal_strength`).
+    * Disconnected NTC sensors (100.0 °C sentinel) now show as unavailable.
+    * New options flow: polling interval (10–3600 s) and host/IP change without re-adding the device.
+    * New diagnostics platform (redacted status dump).
 * **1.3.1**
     * Documentation: corrected the OpenAPI spec for `POST /api/parameters` to declare a JSON `requestBody` instead of `in: query` parameters, matching the actual device behaviour. This unblocks the Prism-backed integration test in CI.
 * **1.3.0**
