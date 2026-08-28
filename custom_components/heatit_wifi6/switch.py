@@ -132,6 +132,18 @@ class HeatitWiFi6Switch(HeatitWiFi6Entity, SwitchEntity):
         self._attr_unique_id = f"heatit_wifi6_{device_id}_{description.key}"
 
     @property
+    def available(self) -> bool:
+        """Unavailable when the device doesn't report the parameter.
+
+        A WiFi7 in Relay mode drops the thermostat-only parameters
+        (e.g. temperatureDisplay, OWD) from /api/status.
+        """
+        if not super().available:
+            return False
+        data = self.coordinator.data
+        return bool(data) and self.entity_description.value_fn(data) is not None
+
+    @property
     def is_on(self) -> bool | None:
         data = self.coordinator.data
         if not data:

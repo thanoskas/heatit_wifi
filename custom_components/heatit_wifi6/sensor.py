@@ -69,7 +69,11 @@ def _target_temperature(data: dict[str, Any]) -> float | None:
 def _wifi_signal(data: dict[str, Any]) -> int | None:
     # The device reports the RSSI as a string like "-37dBm"; strip the
     # unit suffix so the sensor can be numeric (graphs, alerts).
-    raw = (data.get("network") or {}).get("wifiSignalStrength")
+    # The spec nests it under "network" but real WiFi7 firmware (0.1.13)
+    # sends it at the top level of the status payload — accept both.
+    raw = data.get("wifiSignalStrength")
+    if raw is None:
+        raw = (data.get("network") or {}).get("wifiSignalStrength")
     if raw is None:
         return None
     try:

@@ -110,6 +110,13 @@ class HeatitWiFi6RegulationModeSelect(HeatitWiFi6Entity, SelectEntity):
         self._attr_unique_id = f"heatit_wifi6_{device_id}_regulation_mode"
 
     @property
+    def available(self) -> bool:
+        """Unavailable when regulationMode isn't reported (e.g. Relay mode)."""
+        if not super().available:
+            return False
+        return self.current_option is not None
+
+    @property
     def current_option(self) -> str | None:
         data = self.coordinator.data or {}
         value = (data.get("parameters") or {}).get("regulationMode")
