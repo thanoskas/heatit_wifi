@@ -39,11 +39,16 @@ class HeatitWiFi6Entity(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]]]
         data = self.coordinator.data or {}
         network = data.get("network") or {}
 
+        # WiFi7 firmware reports its model in /api/status; WiFi6 (API v7)
+        # has no model field, so fall back to the WiFi6 label. Strip the
+        # "Heatit " prefix since the manufacturer is shown separately.
+        model = data.get("model") or "WiFi6 Thermostat"
+
         info = DeviceInfo(
             identifiers={(DOMAIN, self._device_id)},
             name=self._device_name,
             manufacturer="Heatit",
-            model="WiFi6 Thermostat",
+            model=model.removeprefix("Heatit "),
             sw_version=data.get("firmware"),
         )
         if mac := network.get("mac"):
