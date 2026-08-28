@@ -224,13 +224,16 @@ class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
         return None
 
     def _heatit_state_to_hvac_action(self, state: str | None) -> HVACAction | None:
-        if state == "Idle":
+        # WiFi7 firmware sends states in lowercase (e.g. "open"),
+        # unlike the capitalized values in the spec.
+        normalized = str(state).lower()
+        if normalized == "idle":
             return HVACAction.OFF if self.hvac_mode == HVACMode.OFF else HVACAction.IDLE
-        if state == "Heating":
+        if normalized == "heating":
             return HVACAction.HEATING
-        if state == "Cooling":
+        if normalized == "cooling":
             return HVACAction.COOLING
-        if state in ("Open", "Closed"):
+        if normalized in ("open", "closed"):
             # WiFi7 Relay mode; the climate entity is unavailable then.
             return None
         _LOGGER.error("Unknown state from Heatit: %s", state)

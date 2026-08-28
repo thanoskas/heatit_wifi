@@ -26,6 +26,12 @@ class HeatitWiFi6SwitchEntityDescription(SwitchEntityDescription):
 
     parameter: str
     value_fn: Callable[[dict[str, Any]], bool | None]
+    # The WiFi7 firmware validates parameter types strictly (e.g.
+    # disableButtons must be an integer, not a boolean).
+    payload_fn: Callable[[bool], Any] = bool
+    # Applies the freshly written value to the cached status payload so
+    # the UI updates immediately instead of waiting for the next poll.
+    set_local: Callable[[dict[str, Any], Any], None] | None = None
 
 
 def _parameter_field(name: str) -> Callable[[dict[str, Any]], bool | None]:
@@ -44,6 +50,11 @@ def _owd_enabled(data: dict[str, Any]) -> bool | None:
     return None if value is None else bool(value)
 
 
+def _set_owd_local(data: dict[str, Any], value: Any) -> None:
+    owd = data.setdefault("parameters", {}).setdefault("OWD", {})
+    owd["openWindowDetection"] = value
+
+
 SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
     HeatitWiFi6SwitchEntityDescription(
         key="temperature_display",
@@ -60,6 +71,7 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
         device_class=SwitchDeviceClass.SWITCH,
         parameter="disableButtons",
         value_fn=_parameter_field("disableButtons"),
+        payload_fn=int,
     ),
     HeatitWiFi6SwitchEntityDescription(
         key="open_window_detection",
@@ -68,6 +80,7 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
         device_class=SwitchDeviceClass.SWITCH,
         parameter="openWindowDetection",
         value_fn=_owd_enabled,
+        set_local=_set_owd_local,
     ),
 )
 
@@ -134,11 +147,21 @@ class HeatitWiFi6Switch(HeatitWiFi6Entity, SwitchEntity):
         await self._async_set(False)
 
     async def _async_set(self, value: bool) -> None:
-        parameter = self.entity_description.parameter
-        if not await self._api.set_parameter(parameter, value):
+        description = self.entity_description
+        payload = description.payload_fn(value)
+        if not await self._api.set_parameter(description.parameter, payload):
             raise HomeAssistantError(
-                f"Failed to set {parameter} to {value} on the Heatit thermostat"
+                f"Failed to set {description.parameter} to {payload}"
+                " on the Heatit thermostat"
             )
+        # Reflect the change immediately; the (debounced) refresh only
+        # confirms it later.
+        if data := self.coordinator.data:
+            if description.set_local is not None:
+                description.set_local(data, payload)
+            else:
+                data.setdefault("parameters", {})[description.parameter] = payload
+            self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
 
 
@@ -172,9 +195,11 @@ class HeatitWiFi6RelaySwitch(HeatitWiFi6Entity, SwitchEntity):
     def is_on(self) -> bool | None:
         data = self.coordinator.data or {}
         # Prefer the live relay state; fall back to the onOff parameter.
-        state = data.get("state")
-        if state in ("Open", "Closed"):
-            return state == "Closed"
+        # The spec documents "Open"/"Closed" but real firmware (0.1.13)
+        # sends lowercase, so compare case-insensitively.
+        state = str(data.get("state", "")).lower()
+        if state in ("open", "closed"):
+            return state == "closed"
         value = (data.get("parameters") or {}).get("onOff")
         return None if value is None else bool(value)
 
@@ -191,4 +216,8 @@ class HeatitWiFi6RelaySwitch(HeatitWiFi6Entity, SwitchEntity):
             raise HomeAssistantError(
                 f"Failed to set onOff to {value} on the Heatit relay"
             )
+        if data := self.coordinator.data:
+            data.setdefault("parameters", {})["onOff"] = value
+            data["state"] = "closed" if value else "open"
+            self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
