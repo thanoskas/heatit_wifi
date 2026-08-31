@@ -32,6 +32,8 @@ class HeatitWiFi6SwitchEntityDescription(SwitchEntityDescription):
     # Applies the freshly written value to the cached status payload so
     # the UI updates immediately instead of waiting for the next poll.
     set_local: Callable[[dict[str, Any], Any], None] | None = None
+    # Parameters that only exist on the WiFi7 (Relay mode).
+    wifi7_only: bool = False
 
 
 def _parameter_field(name: str) -> Callable[[dict[str, Any]], bool | None]:
@@ -82,6 +84,27 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
         value_fn=_owd_enabled,
         set_local=_set_owd_local,
     ),
+    # WiFi7 Relay mode extras.
+    HeatitWiFi6SwitchEntityDescription(
+        key="always_on",
+        translation_key="always_on",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+        device_class=SwitchDeviceClass.SWITCH,
+        parameter="alwaysOn",
+        value_fn=_parameter_field("alwaysOn"),
+        wifi7_only=True,
+    ),
+    HeatitWiFi6SwitchEntityDescription(
+        key="inverted_output",
+        translation_key="inverted_output",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+        device_class=SwitchDeviceClass.SWITCH,
+        parameter="invertedOutput",
+        value_fn=_parameter_field("invertedOutput"),
+        wifi7_only=True,
+    ),
 )
 
 
@@ -93,18 +116,21 @@ async def async_setup_entry(
     """Set up the Heatit WiFi6 switches from a config entry."""
     data = entry.runtime_data
     name = entry.data[CONF_NAME]
+    # WiFi7-only entities are skipped on a WiFi6 (which reports no model
+    # field in /api/status and can't be in Relay mode). On a WiFi7 they
+    # stay unavailable until the device is put in Relay mode.
+    status = data.coordinator.data or {}
+    is_wifi7 = bool(status.get("model")) or (
+        (status.get("parameters") or {}).get("sensorMode") == 7
+    )
     entities: list[SwitchEntity] = [
         HeatitWiFi6Switch(
             data.coordinator, data.api, name, data.device_id, description
         )
         for description in SWITCH_DESCRIPTIONS
+        if is_wifi7 or not description.wifi7_only
     ]
-
-    # The relay on/off control only exists on the WiFi7 (which reports a
-    # model field in /api/status). It stays unavailable until the device
-    # is put in Relay mode (sensorMode 7).
-    status = data.coordinator.data or {}
-    if status.get("model") or (status.get("parameters") or {}).get("sensorMode") == 7:
+    if is_wifi7:
         entities.append(
             HeatitWiFi6RelaySwitch(data.coordinator, data.api, name, data.device_id)
         )

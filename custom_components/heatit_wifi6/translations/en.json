@@ -38,6 +38,9 @@
       "button": {
          "reset_energy_meter": {
             "name": "Reset energy meter"
+         },
+         "reset_settings": {
+            "name": "Reset settings to defaults"
          }
       },
       "select": {
@@ -58,6 +61,39 @@
             "state": {
                "hysteresis": "Hysteresis (HYST)",
                "pwm": "PWM"
+            }
+         },
+         "sensor_value": {
+            "name": "NTC sensor type",
+            "state": {
+               "6k8": "6.8 kΩ",
+               "10k": "10 kΩ",
+               "12k": "12 kΩ",
+               "15k": "15 kΩ",
+               "22k": "22 kΩ",
+               "33k": "33 kΩ",
+               "47k": "47 kΩ",
+               "100k": "100 kΩ"
+            }
+         },
+         "external_sensor_fallback": {
+            "name": "External sensor fallback",
+            "state": {
+               "off": "Off",
+               "floor": "Floor sensor (F)",
+               "internal": "Internal sensor (A)",
+               "internal_floor_limit": "Internal + floor limit (AF)",
+               "external": "External sensor (A2)",
+               "external_floor_limit": "External + floor limit (A2F)",
+               "power_regulator": "Power regulator (PWER)"
+            }
+         },
+         "device_restore_state": {
+            "name": "Relay state after power loss",
+            "state": {
+               "previous": "Restore previous state",
+               "on": "On",
+               "off": "Off"
             }
          }
       },
@@ -82,6 +118,39 @@
          },
          "power_regulator_active_time": {
             "name": "Power regulator active time"
+         },
+         "floor_min_temperature": {
+            "name": "Floor minimum temperature"
+         },
+         "floor_max_temperature": {
+            "name": "Floor maximum temperature"
+         },
+         "internal_min_temperature": {
+            "name": "Internal minimum temperature"
+         },
+         "internal_max_temperature": {
+            "name": "Internal maximum temperature"
+         },
+         "external_min_temperature": {
+            "name": "External minimum temperature"
+         },
+         "external_max_temperature": {
+            "name": "External maximum temperature"
+         },
+         "size_of_load": {
+            "name": "Size of load"
+         },
+         "action_after_error": {
+            "name": "Retry delay after error"
+         },
+         "automatic_turn_off": {
+            "name": "Automatic turn off"
+         },
+         "automatic_turn_on": {
+            "name": "Automatic turn on"
+         },
+         "turn_off_delay": {
+            "name": "Turn off delay"
          }
       },
       "switch": {
@@ -96,6 +165,12 @@
          },
          "relay": {
             "name": "Relay"
+         },
+         "always_on": {
+            "name": "Always on"
+         },
+         "inverted_output": {
+            "name": "Inverted output"
          }
       },
       "binary_sensor": {
@@ -136,6 +211,9 @@
          },
          "eco_setpoint": {
             "name": "Eco setpoint"
+         },
+         "open_window_remaining_time": {
+            "name": "Open window remaining time"
          },
          "wifi_signal_strength": {
             "name": "WiFi signal strength"

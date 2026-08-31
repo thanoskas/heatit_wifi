@@ -38,6 +38,9 @@
       "button": {
          "reset_energy_meter": {
             "name": "Nollaa energiamittari"
+         },
+         "reset_settings": {
+            "name": "Palauta oletusasetukset"
          }
       },
       "select": {
@@ -58,6 +61,39 @@
             "state": {
                "hysteresis": "Hystereesi (HYST)",
                "pwm": "PWM"
+            }
+         },
+         "sensor_value": {
+            "name": "NTC-anturin tyyppi",
+            "state": {
+               "6k8": "6,8 kΩ",
+               "10k": "10 kΩ",
+               "12k": "12 kΩ",
+               "15k": "15 kΩ",
+               "22k": "22 kΩ",
+               "33k": "33 kΩ",
+               "47k": "47 kΩ",
+               "100k": "100 kΩ"
+            }
+         },
+         "external_sensor_fallback": {
+            "name": "Ulkoisen anturin varatila",
+            "state": {
+               "off": "Pois",
+               "floor": "Lattia-anturi (F)",
+               "internal": "Sisäinen anturi (A)",
+               "internal_floor_limit": "Sisäinen + lattiarajoitus (AF)",
+               "external": "Ulkoinen anturi (A2)",
+               "external_floor_limit": "Ulkoinen + lattiarajoitus (A2F)",
+               "power_regulator": "Tehonsäädin (PWER)"
+            }
+         },
+         "device_restore_state": {
+            "name": "Releen tila sähkökatkon jälkeen",
+            "state": {
+               "previous": "Palauta edellinen tila",
+               "on": "Päällä",
+               "off": "Pois"
             }
          }
       },
@@ -82,6 +118,39 @@
          },
          "power_regulator_active_time": {
             "name": "Tehonsäätimen aktiiviaika"
+         },
+         "floor_min_temperature": {
+            "name": "Lattian minimilämpötila"
+         },
+         "floor_max_temperature": {
+            "name": "Lattian maksimilämpötila"
+         },
+         "internal_min_temperature": {
+            "name": "Sisäisen anturin minimilämpötila"
+         },
+         "internal_max_temperature": {
+            "name": "Sisäisen anturin maksimilämpötila"
+         },
+         "external_min_temperature": {
+            "name": "Ulkoisen anturin minimilämpötila"
+         },
+         "external_max_temperature": {
+            "name": "Ulkoisen anturin maksimilämpötila"
+         },
+         "size_of_load": {
+            "name": "Kuorman koko"
+         },
+         "action_after_error": {
+            "name": "Uudelleenyrityksen viive virheen jälkeen"
+         },
+         "automatic_turn_off": {
+            "name": "Automaattinen sammutus"
+         },
+         "automatic_turn_on": {
+            "name": "Automaattinen käynnistys"
+         },
+         "turn_off_delay": {
+            "name": "Sammutusviive"
          }
       },
       "switch": {
@@ -96,6 +165,12 @@
          },
          "relay": {
             "name": "Rele"
+         },
+         "always_on": {
+            "name": "Aina päällä"
+         },
+         "inverted_output": {
+            "name": "Käänteinen lähtö"
          }
       },
       "binary_sensor": {
@@ -136,6 +211,9 @@
          },
          "eco_setpoint": {
             "name": "Eco-asetusarvo"
+         },
+         "open_window_remaining_time": {
+            "name": "Avoimen ikkunan jäljellä oleva aika"
          },
          "wifi_signal_strength": {
             "name": "WiFi-signaalin voimakkuus"

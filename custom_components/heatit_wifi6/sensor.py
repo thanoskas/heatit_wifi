@@ -19,6 +19,7 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTemperature,
+    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -65,6 +66,13 @@ def _target_temperature(data: dict[str, Any]) -> float | None:
     if operating_mode == 3:
         return params.get("ecoSetpoint")
     return None
+
+
+def _owd_remaining_time(data: dict[str, Any]) -> int | None:
+    # Seconds until Open Window Detection restores the normal setpoint
+    # (0 when not triggered). Read-only on the device.
+    owd = (data.get("parameters") or {}).get("OWD") or {}
+    return owd.get("activeTime")
 
 
 def _wifi_signal(data: dict[str, Any]) -> int | None:
@@ -178,6 +186,14 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         value_fn=_param("ecoSetpoint"),
+    ),
+    HeatitWiFi6SensorEntityDescription(
+        key="open_window_remaining_time",
+        translation_key="open_window_remaining_time",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=_owd_remaining_time,
     ),
     HeatitWiFi6SensorEntityDescription(
         key="wifi_signal_strength",
