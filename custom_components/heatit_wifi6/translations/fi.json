@@ -6,7 +6,9 @@
          "unknown": "Tuntematon virhe."
       },
       "abort": {
-         "already_configured": "Tämä Heatit-laite on jo konfiguroitu."
+         "already_configured": "Tämä Heatit-laite on jo konfiguroitu.",
+         "different_device": "Osoite viittaa eri Heatit-laitteeseen. Vaihda termostaatti poistamalla ja lisäämällä integraatio uudelleen.",
+         "reconfigure_successful": "Laitteen osoite päivitettiin."
       },
       "step": {
          "user": {
@@ -14,6 +16,13 @@
             "description": "Anna termostaatille lyhyt nimi ja URL-osoitteen perusosa.",
             "data": {
                "name": "Nimi",
+               "host": "Laitteen perus-URL (esim. http://192.168.10.5)"
+            }
+         },
+         "reconfigure": {
+            "title": "Määritä Heatit-laite uudelleen",
+            "description": "Päivitä termostaatin osoite, esim. IP-osoitteen vaihduttua.",
+            "data": {
                "host": "Laitteen perus-URL (esim. http://192.168.10.5)"
             }
          }

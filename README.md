@@ -73,7 +73,8 @@ pytest
 
 ## Version History
 * **1.4.0**
-    * Unit tests (pytest-homeassistant-custom-component) for the number, select, switch, sensor and button platforms, covering the WiFi6, WiFi7 and WiFi7 Relay mode payloads.
+    * Reconfigure support: change the device's address from the entry's ⋮ menu → *Reconfigure* (e.g. after a DHCP lease change) without removing and re-adding the integration. The flow verifies the new address answers and belongs to the same thermostat.
+    * Unit tests (pytest-homeassistant-custom-component) for the number, select, switch, sensor and button platforms plus the config, options and reconfigure flows, covering the WiFi6, WiFi7 and WiFi7 Relay mode payloads.
     * New configuration numbers: floor/internal/external temperature limits (floor limits enabled by default), size of load, retry delay after error; WiFi7 Relay mode timers (automatic turn on/off, turn off delay).
     * New configuration selects: regulation mode (Hysteresis / PWM), NTC sensor type, WiFi7 external sensor fallback and relay state after power loss.
     * New configuration switches (WiFi7 Relay mode): always on, inverted output.

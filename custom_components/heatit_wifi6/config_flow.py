@@ -83,6 +83,43 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Let the user change the device's address without re-adding it."""
+        entry = self._get_reconfigure_entry()
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            host = _normalize_host(user_input[CONF_HOST])
+
+            session = async_get_clientsession(self.hass)
+            api = HeatitWiFi6API(host, session)
+            device_id = await api.get_device_id(retries=1, timeout=10)
+
+            if device_id == "unknown":
+                errors["base"] = "cannot_connect"
+            else:
+                # Guard against pointing the entry at a different
+                # thermostat, which would orphan all its entities.
+                await self.async_set_unique_id(device_id)
+                self._abort_if_unique_id_mismatch(reason="different_device")
+                return self.async_update_reload_and_abort(
+                    entry, data_updates={CONF_HOST: host}
+                )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_HOST, default=entry.data[CONF_HOST]
+                    ): cv.string,
+                }
+            ),
+            errors=errors,
+        )
+
 
 class HeatitWiFi6OptionsFlow(OptionsFlow):
     """Change the polling interval or the device's address."""
