@@ -215,6 +215,14 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         icon="mdi:wifi",
         value_fn=_wifi_quality,
     ),
+    HeatitWiFi6SensorEntityDescription(
+        key="ip_address",
+        translation_key="ip_address",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        icon="mdi:ip-network",
+        value_fn=lambda data: (data.get("network") or {}).get("ipAddress"),
+    ),
 )
 
 

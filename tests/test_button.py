@@ -7,6 +7,9 @@ from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRE
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
+
+from .conftest import setup_entry
 
 
 async def _press(hass: HomeAssistant, entity_id: str) -> None:
@@ -27,13 +30,23 @@ async def test_reset_settings(hass: HomeAssistant, config_entry, mock_api) -> No
     mock_api["reset_device"].assert_awaited_once_with("settings")
 
 
-async def test_no_factory_reset_button(hass: HomeAssistant, config_entry) -> None:
-    """A factory reset would drop the WiFi credentials; never expose it."""
-    assert not [
-        state.entity_id
-        for state in hass.states.async_all(BUTTON_DOMAIN)
-        if "factory" in state.entity_id
-    ]
+async def test_factory_reset(hass: HomeAssistant, config_entry, mock_api) -> None:
+    await _press(hass, "button.lab_thermostat_factory_reset")
+    mock_api["reset_device"].assert_awaited_once_with("factory")
+
+
+async def test_factory_reset_disabled_by_default(
+    hass: HomeAssistant, mock_api
+) -> None:
+    """It wipes the WiFi credentials, so it must be opt-in only."""
+    await setup_entry(hass)
+
+    registry = er.async_get(hass)
+    entry = registry.async_get("button.lab_thermostat_factory_reset")
+    assert entry is not None
+    assert entry.disabled_by is er.RegistryEntryDisabler.INTEGRATION
+    # Without an explicit enable it never becomes a pressable entity.
+    assert hass.states.get("button.lab_thermostat_factory_reset") is None
 
 
 async def test_reset_failure_raises(hass: HomeAssistant, config_entry, mock_api) -> None:

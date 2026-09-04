@@ -80,7 +80,8 @@ pytest
     * New configuration selects: regulation mode (Hysteresis / PWM), NTC sensor type, WiFi7 external sensor fallback and relay state after power loss.
     * New configuration switches (WiFi7 Relay mode): always on, inverted output.
     * New "Reset settings to defaults" button (disabled by default) and an "Open window remaining time" sensor.
-    * New WiFi signal quality (%) sensor next to the dBm one.
+    * New "Factory reset" button (disabled by default). **Warning:** unlike the settings reset, this also erases the WiFi credentials — the thermostat goes offline and must be re-provisioned with the Heatit app. Enable it in the entity registry only when you actually need it.
+    * New WiFi signal quality (%) sensor next to the dBm one, and an IP address diagnostic sensor (disabled by default).
     * Writes no longer trigger an immediate readback (the firmware can report the old value for a moment), so changes stay visible in HA; sibling entities update together.
     * WiFi7 fixes from live testing: child lock payload type, lowercase relay states, 0–100 display brightness scale, renamed calibration parameters, top-level `wifiSignalStrength`, and entities that don't apply in Relay mode show as unavailable.
     * WiFi7 support: confirmed working on real hardware; the device model is now read from the API (`model` field), so WiFi7 units are labeled correctly.

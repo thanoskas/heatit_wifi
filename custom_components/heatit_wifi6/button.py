@@ -25,8 +25,6 @@ class HeatitWiFi6ButtonEntityDescription(ButtonEntityDescription):
     reset_type: str
 
 
-# A factory reset is deliberately not exposed: it also wipes the WiFi
-# credentials, which would take the device offline.
 BUTTON_DESCRIPTIONS: tuple[HeatitWiFi6ButtonEntityDescription, ...] = (
     HeatitWiFi6ButtonEntityDescription(
         key="reset_energy_meter",
@@ -40,6 +38,16 @@ BUTTON_DESCRIPTIONS: tuple[HeatitWiFi6ButtonEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
         reset_type="settings",
+    ),
+    # Wipes everything INCLUDING the WiFi credentials, taking the device
+    # offline until it is re-provisioned with the Heatit app. Disabled by
+    # default so it can only be pressed after being enabled on purpose.
+    HeatitWiFi6ButtonEntityDescription(
+        key="factory_reset",
+        translation_key="factory_reset",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+        reset_type="factory",
     ),
 )
 

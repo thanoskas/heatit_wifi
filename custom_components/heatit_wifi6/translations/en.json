@@ -59,6 +59,9 @@
          },
          "reset_settings": {
             "name": "Reset settings to defaults"
+         },
+         "factory_reset": {
+            "name": "Factory reset"
          }
       },
       "select": {
@@ -238,6 +241,9 @@
          },
          "wifi_signal_quality": {
             "name": "WiFi signal quality"
+         },
+         "ip_address": {
+            "name": "IP address"
          }
       }
    }

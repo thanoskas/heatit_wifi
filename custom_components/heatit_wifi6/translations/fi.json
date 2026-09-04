@@ -59,6 +59,9 @@
          },
          "reset_settings": {
             "name": "Palauta oletusasetukset"
+         },
+         "factory_reset": {
+            "name": "Tehdasasetusten palautus"
          }
       },
       "select": {
@@ -238,6 +241,9 @@
          },
          "wifi_signal_quality": {
             "name": "WiFi-signaalin laatu"
+         },
+         "ip_address": {
+            "name": "IP-osoite"
          }
       }
    }

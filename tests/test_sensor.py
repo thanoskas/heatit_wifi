@@ -72,3 +72,7 @@ async def test_unavailable_when_device_unreachable(
         hass.states.get("sensor.lab_thermostat_current_temperature").state
         == STATE_UNAVAILABLE
     )
+
+
+async def test_ip_address(hass: HomeAssistant, config_entry) -> None:
+    assert hass.states.get("sensor.lab_thermostat_ip_address").state == "192.168.1.50"
