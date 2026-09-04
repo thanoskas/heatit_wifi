@@ -7,9 +7,11 @@
       },
       "abort": {
          "already_configured": "Tämä Heatit-laite on jo konfiguroitu.",
+         "cannot_connect": "Löydetty laite ei vastannut Heatitin paikalliseen API:in.",
          "different_device": "Osoite viittaa eri Heatit-laitteeseen. Vaihda termostaatti poistamalla ja lisäämällä integraatio uudelleen.",
          "reconfigure_successful": "Laitteen osoite päivitettiin."
       },
+      "flow_title": "Heatit-termostaatti osoitteessa {host}",
       "step": {
          "user": {
             "title": "Määritä Heatit WiFi6",
@@ -24,6 +26,13 @@
             "description": "Päivitä termostaatin osoite, esim. IP-osoitteen vaihduttua.",
             "data": {
                "host": "Laitteen perus-URL (esim. http://192.168.10.5)"
+            }
+         },
+         "zeroconf_confirm": {
+            "title": "Heatit-termostaatti löydetty",
+            "description": "Heatit-termostaatti löytyi osoitteesta {host}. Anna lyhyt nimi lisätäksesi sen.",
+            "data": {
+               "name": "Nimi"
             }
          }
       }

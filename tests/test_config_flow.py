@@ -1,21 +1,36 @@
-"""Tests for the config, options and reconfigure flows."""
+"""Tests for the config, options, reconfigure and zeroconf flows."""
 from __future__ import annotations
 
+from ipaddress import ip_address
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from homeassistant.config_entries import SOURCE_USER
+from homeassistant.config_entries import SOURCE_USER, SOURCE_ZEROCONF
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from custom_components.heatit_wifi6.const import DOMAIN
 
 from .conftest import DEVICE_ID, DEVICE_NAME
 
 OTHER_DEVICE_ID = "AABBCCDDEEFF"
+
+
+def _discovery_info(ip: str = "192.168.1.17") -> ZeroconfServiceInfo:
+    """The advertisement a WiFi7 (fw 0.1.13) actually sends."""
+    return ZeroconfServiceInfo(
+        ip_address=ip_address(ip),
+        ip_addresses=[ip_address(ip)],
+        hostname="tf-D4556A.local.",
+        name="directlink._tf._tcp.local.",
+        port=80,
+        properties={"mid": DEVICE_ID, "state": "stop", "id": DEVICE_ID},
+        type="_tf._tcp.local.",
+    )
 
 
 def _patch_device_id(value: str):
@@ -172,6 +187,64 @@ async def test_reconfigure_rejects_different_device(
     # The entry keeps pointing at the original thermostat.
     assert entry.data[CONF_HOST] == "http://192.168.1.50"
     assert entry.unique_id == DEVICE_ID
+
+
+async def test_zeroconf_discovers_new_device(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
+    with _patch_device_id(DEVICE_ID):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_ZEROCONF},
+            data=_discovery_info(),
+        )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "zeroconf_confirm"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_NAME: DEVICE_NAME}
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["title"] == f"Heatit WiFi6 ({DEVICE_NAME})"
+    assert result["data"] == {
+        CONF_NAME: DEVICE_NAME,
+        CONF_HOST: "http://192.168.1.17",
+    }
+    assert result["result"].unique_id == DEVICE_ID
+
+
+async def test_zeroconf_updates_host_of_known_device(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
+    """A DHCP lease change: discovery silently fixes the stored host."""
+    entry = _make_entry(hass)
+    assert entry.data[CONF_HOST] == "http://192.168.1.50"
+
+    with _patch_device_id(DEVICE_ID):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_ZEROCONF},
+            data=_discovery_info("192.168.1.99"),
+        )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert entry.data[CONF_HOST] == "http://192.168.1.99"
+
+
+async def test_zeroconf_ignores_non_heatit_tf_device(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
+    """Another ThermoFloor product without the local API aborts silently."""
+    with _patch_device_id("unknown"):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_ZEROCONF},
+            data=_discovery_info(),
+        )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "cannot_connect"
 
 
 async def test_options_flow_sets_scan_interval(

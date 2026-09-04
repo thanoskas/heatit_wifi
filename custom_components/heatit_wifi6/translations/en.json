@@ -7,9 +7,11 @@
       },
       "abort": {
          "already_configured": "This Heatit device is already configured.",
+         "cannot_connect": "The discovered device did not answer the Heatit local API.",
          "different_device": "The address points to a different Heatit device. To replace the thermostat, remove and re-add the integration.",
          "reconfigure_successful": "The device address was updated."
       },
+      "flow_title": "Heatit thermostat at {host}",
       "step": {
          "user": {
             "title": "Configure Heatit WiFi6",
@@ -24,6 +26,13 @@
             "description": "Update the address of the thermostat, e.g. after its IP changed.",
             "data": {
                "host": "Device base URL (e.g. http://192.168.10.5)"
+            }
+         },
+         "zeroconf_confirm": {
+            "title": "Heatit thermostat discovered",
+            "description": "A Heatit thermostat was found at {host}. Enter a short name to add it.",
+            "data": {
+               "name": "Name"
             }
          }
       }

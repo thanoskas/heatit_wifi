@@ -73,6 +73,7 @@ pytest
 
 ## Version History
 * **1.4.0**
+    * Zeroconf discovery: WiFi7 firmware (confirmed on 0.1.13) advertises `directlink._tf._tcp` via mDNS, so Home Assistant now discovers the thermostat automatically — and when a known thermostat shows up on a new IP (DHCP lease change), the stored address is updated in place without any user action. Devices answering `_tf._tcp` without the Heatit local API are ignored silently.
     * Reconfigure support: change the device's address from the entry's ⋮ menu → *Reconfigure* (e.g. after a DHCP lease change) without removing and re-adding the integration. The flow verifies the new address answers and belongs to the same thermostat.
     * Unit tests (pytest-homeassistant-custom-component) for the number, select, switch, sensor and button platforms plus the config, options and reconfigure flows, covering the WiFi6, WiFi7 and WiFi7 Relay mode payloads.
     * New configuration numbers: floor/internal/external temperature limits (floor limits enabled by default), size of load, retry delay after error; WiFi7 Relay mode timers (automatic turn on/off, turn off delay).

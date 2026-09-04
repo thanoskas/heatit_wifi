@@ -6,6 +6,7 @@
   "documentation": "https://github.com/mattik-gh/heatit_wifi6",
   "dependencies": ["network"],
   "requirements": [],
+  "zeroconf": [{"type": "_tf._tcp.local."}],
   "codeowners": ["@mattik-gh"],
   "integration_type": "device",
   "iot_class": "local_polling",

@@ -16,6 +16,7 @@ from homeassistant.const import CONF_HOST, CONF_NAME, CONF_SCAN_INTERVAL
 from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .api import HeatitWiFi6API
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
@@ -40,6 +41,10 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle the user-driven config flow for Heatit WiFi6 thermostats."""
 
     VERSION = 1
+
+    def __init__(self) -> None:
+        """Initialize the flow."""
+        self._discovered_host: str | None = None
 
     @staticmethod
     @callback
@@ -81,6 +86,54 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=STEP_USER_DATA_SCHEMA,
             errors=errors,
+        )
+
+    async def async_step_zeroconf(
+        self, discovery_info: ZeroconfServiceInfo
+    ) -> ConfigFlowResult:
+        """Handle a device discovered via mDNS.
+
+        Heatit WiFi7 firmware (0.1.13+) advertises ``directlink._tf._tcp``
+        with the device id in the TXT record. The API is probed before
+        showing anything, so other ThermoFloor products that may share the
+        ``_tf`` type are dropped silently.
+        """
+        host = _normalize_host(str(discovery_info.ip_address))
+
+        session = async_get_clientsession(self.hass)
+        api = HeatitWiFi6API(host, session)
+        device_id = await api.get_device_id(retries=1, timeout=10)
+        if device_id == "unknown":
+            return self.async_abort(reason="cannot_connect")
+
+        await self.async_set_unique_id(device_id)
+        # Known device on a new IP: update the entry in place and stop —
+        # this is what makes DHCP lease changes a non-event.
+        self._abort_if_unique_id_configured(updates={CONF_HOST: host})
+
+        self._discovered_host = host
+        self.context["title_placeholders"] = {"host": host}
+        return await self.async_step_zeroconf_confirm()
+
+    async def async_step_zeroconf_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for a name before adding the discovered device."""
+        assert self._discovered_host is not None
+
+        if user_input is not None:
+            return self.async_create_entry(
+                title=f"Heatit WiFi6 ({user_input[CONF_NAME]})",
+                data={
+                    CONF_NAME: user_input[CONF_NAME],
+                    CONF_HOST: self._discovered_host,
+                },
+            )
+
+        return self.async_show_form(
+            step_id="zeroconf_confirm",
+            data_schema=vol.Schema({vol.Required(CONF_NAME): cv.string}),
+            description_placeholders={"host": self._discovered_host},
         )
 
     async def async_step_reconfigure(
