@@ -1,15 +1,15 @@
 {
   "domain": "heatit_wifi",
   "name": "Heatit WiFi",
-  "version": "2.0.0",
-  "config_flow": true,
-  "documentation": "https://github.com/thanoskas/heatit_wifi",
-  "dependencies": ["network"],
-  "requirements": [],
-  "zeroconf": [{"type": "_tf._tcp.local."}],
   "codeowners": ["@thanoskas"],
+  "config_flow": true,
+  "dependencies": ["network"],
+  "documentation": "https://github.com/thanoskas/heatit_wifi",
   "integration_type": "device",
   "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/thanoskas/heatit_wifi/issues",
   "quality_scale": "bronze",
-  "issue_tracker": "https://github.com/thanoskas/heatit_wifi/issues"
+  "requirements": [],
+  "version": "2.0.0",
+  "zeroconf": [{"type": "_tf._tcp.local."}]
 }
