@@ -1,6 +1,6 @@
 # Heatit WiFi — Ενσωμάτωση για το Home Assistant
 
-Τοπική ενσωμάτωση (μόνο στο δίκτυό σας, χωρίς cloud) για τους θερμοστάτες **Heatit WiFi6** και **Heatit WiFi7** της Thermo-Floor AS. Η ενσωμάτωση αναπτύσσεται και συντηρείται από τη [Smart Home Hellas](mailto:info@smarthomehellas.gr).
+Τοπική ενσωμάτωση (μόνο στο δίκτυό σας, χωρίς cloud) για τους θερμοστάτες **Heatit WiFi6** και **Heatit WiFi7** της Heatit (Thermo-Floor AS). Η ενσωμάτωση αναπτύσσεται και συντηρείται από τη [Smart Home Hellas](mailto:info@smarthomehellas.gr).
 
 Πλήρης τεκμηρίωση (λίστα οντοτήτων, ιστορικό εκδόσεων, ανάπτυξη): [README.md](README.md) στα αγγλικά.
 

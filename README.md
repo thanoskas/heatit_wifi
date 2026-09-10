@@ -4,14 +4,14 @@
 [![Unit tests](https://github.com/thanoskas/heatit_wifi/actions/workflows/tests.yml/badge.svg)](https://github.com/thanoskas/heatit_wifi/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-Local (LAN-only, no cloud) Home Assistant integration for the **Heatit WiFi6** and **Heatit WiFi7** thermostats by Thermo-Floor AS, using the thermostats' built-in HTTP API.
+Local (LAN-only, no cloud) Home Assistant integration for the **Heatit WiFi6** and **Heatit WiFi7** thermostats by Heatit, using the thermostats' built-in HTTP API.
 
 Developed and maintained by [Smart Home Hellas](mailto:info@smarthomehellas.gr), building on the original `heatit_wifi6` community integration by [mattik-gh](https://github.com/mattik-gh/heatit_wifi6) (see [Credits](#credits)).
 
 🇬🇷 Οδηγίες στα ελληνικά: [README.el.md](README.el.md)
 
 ## Disclaimer
-This is a third-party integration. It is not (yet) an official product of Heatit / Thermo-Floor AS. Use it at your own risk.
+This is a third-party integration. It is not (yet) an official product of Heatit (Thermo-Floor AS). Use it at your own risk.
 
 ## Supported devices
 | Device | Firmware | Discovery |
