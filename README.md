@@ -1,7 +1,7 @@
 # Heatit WiFi integration for Home Assistant
 
-[![Validate](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/validate.yml/badge.svg)](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/validate.yml)
-[![Unit tests](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/tests.yml/badge.svg)](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/tests.yml)
+[![Validate](https://github.com/thanoskas/heatit_wifi/actions/workflows/validate.yml/badge.svg)](https://github.com/thanoskas/heatit_wifi/actions/workflows/validate.yml)
+[![Unit tests](https://github.com/thanoskas/heatit_wifi/actions/workflows/tests.yml/badge.svg)](https://github.com/thanoskas/heatit_wifi/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
 Local (LAN-only, no cloud) Home Assistant integration for the **Heatit WiFi6** and **Heatit WiFi7** thermostats by Thermo-Floor AS, using the thermostats' built-in HTTP API.
@@ -33,12 +33,12 @@ Both models expose the same local HTTP API (`/api/status`, `/api/parameters`, `/
 ### Option 1 — HACS (recommended)
 1. Make sure [HACS](https://hacs.xyz/) is installed.
 2. Open **HACS**, click the **⋮** menu (top right) and choose **Custom repositories**.
-3. Repository: `https://github.com/smarthomehellas/heatit_wifi` — Type: **Integration** — click **Add**.
+3. Repository: `https://github.com/thanoskas/heatit_wifi` — Type: **Integration** — click **Add**.
 4. Search for **Heatit WiFi** in HACS and click **Download**.
 5. Restart Home Assistant.
 
 ### Option 2 — Manual
-1. Download the latest release from the [Releases](https://github.com/smarthomehellas/heatit_wifi/releases) page.
+1. Download the latest release from the [Releases](https://github.com/thanoskas/heatit_wifi/releases) page.
 2. Copy the folder `custom_components/heatit_wifi` into your Home Assistant `config/custom_components/` directory (final path: `config/custom_components/heatit_wifi/manifest.json`).
 3. Restart Home Assistant.
 
@@ -88,7 +88,7 @@ Version 2.0.0 renamed the integration from *Heatit WiFi6* (domain `heatit_wifi6`
 * **Device stopped updating after a router change:** the thermostat got a new IP. Use **⋮ → Reconfigure** on the entry (or wait for mDNS to update it automatically on WiFi7/WiFi6 V2).
 * **Floor/external temperature shows unavailable:** the sensor is disconnected or the wrong NTC type is selected (the firmware reports 100 °C in that case).
 * **A setting does not stick:** the firmware can briefly report the previous value after a write. The integration keeps the value you set until the next poll confirms it.
-* For bug reports use the [issue tracker](https://github.com/smarthomehellas/heatit_wifi/issues) and attach the diagnostics download from the device page (it is redacted).
+* For bug reports use the [issue tracker](https://github.com/thanoskas/heatit_wifi/issues) and attach the diagnostics download from the device page (it is redacted).
 
 ## Development
 ```bash

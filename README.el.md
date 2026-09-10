@@ -16,12 +16,12 @@
 ### Τρόπος 1 — HACS (προτείνεται)
 1. Βεβαιωθείτε ότι έχετε εγκατεστημένο το [HACS](https://hacs.xyz/).
 2. Ανοίξτε το **HACS**, πατήστε το μενού **⋮** (πάνω δεξιά) και επιλέξτε **Custom repositories**.
-3. Repository: `https://github.com/smarthomehellas/heatit_wifi` — Type: **Integration** — πατήστε **Add**.
+3. Repository: `https://github.com/thanoskas/heatit_wifi` — Type: **Integration** — πατήστε **Add**.
 4. Αναζητήστε **Heatit WiFi** στο HACS και πατήστε **Download**.
 5. Κάντε επανεκκίνηση του Home Assistant.
 
 ### Τρόπος 2 — Χειροκίνητα
-1. Κατεβάστε την τελευταία έκδοση από τη σελίδα [Releases](https://github.com/smarthomehellas/heatit_wifi/releases).
+1. Κατεβάστε την τελευταία έκδοση από τη σελίδα [Releases](https://github.com/thanoskas/heatit_wifi/releases).
 2. Αντιγράψτε τον φάκελο `custom_components/heatit_wifi` μέσα στον φάκελο `config/custom_components/` του Home Assistant (τελική διαδρομή: `config/custom_components/heatit_wifi/manifest.json`).
 3. Κάντε επανεκκίνηση του Home Assistant.
 
@@ -68,7 +68,7 @@
 * **«Αδυναμία σύνδεσης»:** ανοίξτε `http://<ip-θερμοστάτη>/api/status` σε browser στο ίδιο δίκτυο. Αν εμφανιστεί JSON, το Home Assistant μπορεί να τον δει. Αν όχι, ελέγξτε την IP στην εφαρμογή Heatit ή στον router.
 * **Σταμάτησε να ενημερώνεται μετά από αλλαγή router:** ο θερμοστάτης πήρε νέα IP. Χρησιμοποιήστε **⋮ → Επαναδιαμόρφωση** στην καταχώρηση (στο WiFi7 / WiFi6 V2 ενημερώνεται και αυτόματα).
 * **Η θερμοκρασία δαπέδου δείχνει μη διαθέσιμη:** ο αισθητήρας είναι αποσυνδεδεμένος ή έχει επιλεγεί λάθος τύπος NTC.
-* Για αναφορές σφαλμάτων χρησιμοποιήστε το [issue tracker](https://github.com/smarthomehellas/heatit_wifi/issues) και επισυνάψτε το αρχείο διαγνωστικών από τη σελίδα της συσκευής.
+* Για αναφορές σφαλμάτων χρησιμοποιήστε το [issue tracker](https://github.com/thanoskas/heatit_wifi/issues) και επισυνάψτε το αρχείο διαγνωστικών από τη σελίδα της συσκευής.
 
 ## Υποστήριξη
 Smart Home Hellas — [info@smarthomehellas.gr](mailto:info@smarthomehellas.gr)

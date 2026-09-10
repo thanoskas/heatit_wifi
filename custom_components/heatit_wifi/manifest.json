@@ -3,7 +3,7 @@
   "name": "Heatit WiFi",
   "version": "2.0.0",
   "config_flow": true,
-  "documentation": "https://github.com/smarthomehellas/heatit_wifi",
+  "documentation": "https://github.com/thanoskas/heatit_wifi",
   "dependencies": ["network"],
   "requirements": [],
   "zeroconf": [{"type": "_tf._tcp.local."}],
@@ -11,5 +11,5 @@
   "integration_type": "device",
   "iot_class": "local_polling",
   "quality_scale": "bronze",
-  "issue_tracker": "https://github.com/smarthomehellas/heatit_wifi/issues"
+  "issue_tracker": "https://github.com/thanoskas/heatit_wifi/issues"
 }
