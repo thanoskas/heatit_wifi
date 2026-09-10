@@ -1,7 +1,7 @@
-"""Constants for the Heatit WiFi6 integration."""
+"""Constants for the Heatit WiFi integration."""
 from typing import Final
 
-DOMAIN: Final = "heatit_wifi6"
+DOMAIN: Final = "heatit_wifi"
 
 # Status polling interval in minutes.
 POLL_INTERVAL: Final = 1

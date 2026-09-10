@@ -1,4 +1,4 @@
-"""Tests for the Heatit WiFi6 select platform."""
+"""Tests for the Heatit WiFi select platform."""
 from __future__ import annotations
 
 import copy

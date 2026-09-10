@@ -1,4 +1,4 @@
-"""Tests for the Heatit WiFi6 button platform."""
+"""Tests for the Heatit WiFi button platform."""
 from __future__ import annotations
 
 import pytest

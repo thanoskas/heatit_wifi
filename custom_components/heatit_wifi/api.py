@@ -1,4 +1,4 @@
-"""HTTP client for the Heatit WiFi6 thermostat REST API."""
+"""HTTP client for the Heatit WiFi thermostat REST API."""
 from __future__ import annotations
 
 import asyncio
@@ -13,7 +13,7 @@ from .const import API_PARAMETERS, API_RESET, API_STATUS
 _LOGGER = logging.getLogger(__name__)
 
 
-class HeatitWiFi6API:
+class HeatitWiFiAPI:
     """Thin async wrapper around the thermostat's HTTP API."""
 
     def __init__(self, host: str, session: aiohttp.ClientSession) -> None:

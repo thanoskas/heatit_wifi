@@ -1,5 +1,5 @@
 {
-   "title": "Heatit WiFi6 Termostaatti",
+   "title": "Heatit WiFi",
    "config": {
       "error": {
          "cannot_connect": "Yhteys epäonnistui. Tarkista osoite ja anna vain url-osoitteen perusosa, esim. http://192.168.10.5",
@@ -14,7 +14,7 @@
       "flow_title": "Heatit-termostaatti osoitteessa {host}",
       "step": {
          "user": {
-            "title": "Määritä Heatit WiFi6",
+            "title": "Määritä Heatit WiFi",
             "description": "Anna termostaatille lyhyt nimi ja URL-osoitteen perusosa.",
             "data": {
                "name": "Nimi",
@@ -44,7 +44,7 @@
       },
       "step": {
          "init": {
-            "title": "Heatit WiFi6 -asetukset",
+            "title": "Heatit WiFi -asetukset",
             "data": {
                "host": "Laitteen perus-URL (esim. http://192.168.10.5)",
                "scan_interval": "Päivitysväli (sekuntia)"

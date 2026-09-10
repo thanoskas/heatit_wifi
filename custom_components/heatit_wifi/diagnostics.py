@@ -1,4 +1,4 @@
-"""Diagnostics support for the Heatit WiFi6 integration."""
+"""Diagnostics support for the Heatit WiFi integration."""
 from __future__ import annotations
 
 from typing import Any
@@ -7,14 +7,14 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
 
-from . import HeatitWiFi6ConfigEntry
+from . import HeatitWiFiConfigEntry
 
 # Network identifiers that don't belong in shared bug reports.
 TO_REDACT = {CONF_HOST, "SSID", "mac", "ipAddress", "id"}
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: HeatitWiFi6ConfigEntry
+    hass: HomeAssistant, entry: HeatitWiFiConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     data = entry.runtime_data

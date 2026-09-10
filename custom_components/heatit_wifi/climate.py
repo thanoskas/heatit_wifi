@@ -1,4 +1,4 @@
-"""Climate platform for the Heatit WiFi6 thermostat."""
+"""Climate platform for the Heatit WiFi thermostat."""
 from __future__ import annotations
 
 import logging
@@ -17,10 +17,10 @@ from homeassistant.const import CONF_NAME, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import HeatitWiFi6ConfigEntry
-from .api import HeatitWiFi6API
+from . import HeatitWiFiConfigEntry
+from .api import HeatitWiFiAPI
 from .const import NTC_FAULT_TEMPERATURE
-from .entity import HeatitWiFi6Entity
+from .entity import HeatitWiFiEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,15 +38,15 @@ SETPOINT_BY_OPERATING_MODE = {
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: HeatitWiFi6ConfigEntry,
+    entry: HeatitWiFiConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Heatit WiFi6 climate entity from a config entry."""
+    """Set up the Heatit WiFi climate entity from a config entry."""
     data = entry.runtime_data
     name = entry.data[CONF_NAME]
     async_add_entities(
         [
-            HeatitWiFi6Thermostat(
+            HeatitWiFiThermostat(
                 data.coordinator,
                 data.api,
                 name,
@@ -55,12 +55,12 @@ async def async_setup_entry(
         ]
     )
     _LOGGER.info(
-        "Heatit WiFi6 climate entity for %s added to the list of entities", name
+        "Heatit WiFi climate entity for %s added to the list of entities", name
     )
 
 
-class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
-    """Representation of a Heatit WiFi6 thermostat."""
+class HeatitWiFiThermostat(HeatitWiFiEntity, ClimateEntity):
+    """Representation of a Heatit WiFi thermostat."""
 
     _attr_name = None
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
@@ -79,14 +79,14 @@ class HeatitWiFi6Thermostat(HeatitWiFi6Entity, ClimateEntity):
     def __init__(
         self,
         coordinator,
-        api: HeatitWiFi6API,
+        api: HeatitWiFiAPI,
         device_name: str,
         device_id: str,
     ) -> None:
         """Initialize the thermostat entity."""
         super().__init__(coordinator, device_name, device_id)
         self._api = api
-        self._attr_unique_id = f"heatit_wifi6_{device_id}"
+        self._attr_unique_id = f"heatit_wifi_{device_id}"
 
     def _parameters(self) -> dict[str, Any]:
         data = self.coordinator.data or {}

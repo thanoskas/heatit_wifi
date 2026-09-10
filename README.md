@@ -1,78 +1,110 @@
-# Heatit WiFi6 Integration for Home Assistant
+# Heatit WiFi integration for Home Assistant
 
-This integration provides support for Heatit WiFi6 thermostats in Home Assistant.
-The device is also sold under various other names depending on the region, such as "Älytermostaatti Pistesarjat WiFi6" in Finland.
+[![Validate](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/validate.yml/badge.svg)](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/validate.yml)
+[![Unit tests](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/tests.yml/badge.svg)](https://github.com/smarthomehellas/heatit_wifi/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+
+Local (LAN-only, no cloud) Home Assistant integration for the **Heatit WiFi6** and **Heatit WiFi7** thermostats by Thermo-Floor AS, using the thermostats' built-in HTTP API.
+
+Developed and maintained by [Smart Home Hellas](mailto:info@smarthomehellas.gr), building on the original `heatit_wifi6` community integration by [mattik-gh](https://github.com/mattik-gh/heatit_wifi6) (see [Credits](#credits)).
+
+🇬🇷 Οδηγίες στα ελληνικά: [README.el.md](README.el.md)
 
 ## Disclaimer
-This software is a third-party integration and is not affiliated with, maintained, or supported by Heatit (Thermo-Floor AS). Use it at your own risk.
+This is a third-party integration. It is not (yet) an official product of Heatit / Thermo-Floor AS. Use it at your own risk.
 
-## Supported Devices
-* Heatit WiFi6 Thermostat (Firmware v2.20 and newer)
-* Heatit WiFi7 Thermostat (tested on firmware 0.1.13 — note the WiFi7 firmware numbering starts at 0.x)
+## Supported devices
+| Device | Firmware | Discovery |
+|---|---|---|
+| Heatit WiFi6 thermostat, V2 (DirectLink firmware) | 2.20 and newer | automatic (mDNS) |
+| Heatit WiFi6 thermostat, V1 | 2.20 and newer | manual IP entry |
+| Heatit WiFi7 thermostat | 0.1.13 and newer (the WiFi7 firmware numbering starts at 0.x) | automatic (mDNS) |
 
-### WiFi7 compatibility notes
-The WiFi7 exposes the same local HTTP API as the WiFi6 (`/api/status`, `/api/parameters`, `/api/reset/...`), so all entities of this integration work on both models. Additionally:
-* The WiFi7 reports a `model` field in `/api/status`; the device page shows the correct model automatically (WiFi6 devices fall back to "WiFi6 Thermostat").
-* The WiFi7 adds a Relay sensor mode (RELA) — available in the sensor mode select; selecting it on a WiFi6 is rejected by the device. While in Relay mode, a "Relay" switch entity controls the output (`onOff` parameter) and the climate entity becomes unavailable (the device is a plain on/off relay then).
-* WiFi7-only features (BlueFusion BLE devices, DirectLink, `externalSensorFallback`) are not yet supported by this integration.
+The WiFi6 is also sold under other names depending on the region, e.g. "Älytermostaatti Pistesarjat WiFi6" in Finland.
+
+Both models expose the same local HTTP API (`/api/status`, `/api/parameters`, `/api/reset/...`), so every entity of this integration works on both. Differences are handled automatically:
+* The WiFi7 reports a `model` field, so the device page shows the correct model. WiFi6 units are labeled "WiFi6 Thermostat".
+* The WiFi7 adds a **Relay** sensor mode (RELA). While in Relay mode a "Relay" switch controls the output and the climate entity becomes unavailable (the device is a plain on/off relay then). Selecting Relay mode on a WiFi6 is rejected by the device.
+* WiFi7-only extras (external sensor fallback, relay timers, relay state after power loss) are only offered on WiFi7 units.
+* Not supported yet: WiFi7 BlueFusion (BLE accessories) and DirectLink pairing.
 
 ## Installation
 
-### Method 1: HACS (Recommended)
-1. Ensure [HACS](https://hacs.xyz/) is installed.
-2. Go to **HACS** -> **Integrations**.
-3. Click the three dots in the top right corner and select **Custom repositories**.
-4. Add the URL to this repository, select **Integration** as the category, and click **Add**.
-5. Find "Heatit WiFi6" in the list and click **Install**.
-6. Restart Home Assistant.
+### Option 1 — HACS (recommended)
+1. Make sure [HACS](https://hacs.xyz/) is installed.
+2. Open **HACS**, click the **⋮** menu (top right) and choose **Custom repositories**.
+3. Repository: `https://github.com/smarthomehellas/heatit_wifi` — Type: **Integration** — click **Add**.
+4. Search for **Heatit WiFi** in HACS and click **Download**.
+5. Restart Home Assistant.
 
-### Method 2: Manual Installation
-1. Download the `heatit_wifi6` folder from `custom_components/` in this repository.
-2. Copy the folder into your Home Assistant `config/custom_components/` directory.
+### Option 2 — Manual
+1. Download the latest release from the [Releases](https://github.com/smarthomehellas/heatit_wifi/releases) page.
+2. Copy the folder `custom_components/heatit_wifi` into your Home Assistant `config/custom_components/` directory (final path: `config/custom_components/heatit_wifi/manifest.json`).
 3. Restart Home Assistant.
 
 ## Setup
-1. Ensure your thermostat is connected to your local WiFi network via the official Heatit mobile app.
-2. In Home Assistant, go to **Settings** -> **Devices & Services** -> **Add Integration**.
-3. Search for **Heatit WiFi6**.
-4. Enter a descriptive name for your device.
-5. Enter the local IP address of the thermostat (e.g., `http://192.168.1.50`).
-6. Submit the configuration.
+The thermostat must already be connected to your WiFi network through the official Heatit app.
 
-## Features & Usage
-* **Climate entity:** Heat / Cool / Off modes, target temperature, and an Eco preset.
-* **Sensor modes:** Supports Floor, Internal, and External sensor modes. The climate entity's current temperature automatically reflects the active sensor mode.
-* **Sensors (enabled by default):** Current temperature, target temperature, power, and energy.
-* **Sensors (disabled by default, enable per-entity if needed):**
-    * Internal, external, and floor temperatures (always available, regardless of sensor mode)
-    * Heating, cooling, and eco setpoints (diagnostic)
-    * WiFi signal strength (dBm) and WiFi signal quality (%) (diagnostic)
-* **Binary sensors:** Open window detected, and open window detection enabled (diagnostic).
-* **Open window remaining time (diagnostic):** Seconds until the open window detection restores the normal setpoint.
-* **Switches (configuration):** Display measured temperature (instead of the setpoint, on the standby screen), child lock, and open window detection.
-* **Relay switch (WiFi7 only):** Controls the output when the device runs in Relay mode; unavailable in the thermostat modes. Relay mode extras (disabled by default): always on, inverted output, automatic turn on/off timers, turn off delay, and relay state after power loss.
-* **Buttons (configuration):** Reset energy meter (kWh), and reset settings to defaults (disabled by default; keeps the WiFi credentials).
-* **Numbers (configuration):** Floor minimum/maximum temperature limits (enabled by default — floor protection), and disabled by default: internal/external temperature limits, hysteresis, active/standby display brightness, internal/floor/external sensor calibration, power regulator active time (PWER duty cycle), size of load (for contactor installs), and the retry delay after an overload/overheat error.
-* **Selects (configuration, disabled by default):** Sensor mode (Floor / Internal / AF / External / A2F / Power regulator / Relay*), regulation mode (Hysteresis / PWM), NTC sensor type (6.8–100 kΩ; the WiFi6 and WiFi7 number these differently, handled automatically), and external sensor fallback*.
-* **Entities that don't apply to the current mode** (e.g. thermostat settings while a WiFi7 runs in Relay mode) show as unavailable instead of unknown.
-* **Faulty sensor handling:** A disconnected floor/external NTC sensor (reported as exactly 100.0 °C by the firmware) shows as unavailable instead of 100 °C.
-* **Device page:** Each thermostat is linked to its web UI via the `Visit` button (uses the device's local IP) and shows the WiFi MAC under connections.
-* **Polling:** Local polling, once per minute by default — configurable (10–3600 s) via the integration's options. The options also allow changing the device's address (e.g. after a new DHCP lease) without re-adding it.
-* **Diagnostics:** Download a redacted `/api/status` dump from the device page for bug reports.
-* **Advanced control:** Parameters can be changed via HTTP POST to `/api/parameters` on the device. See the OpenAPI documentation in the `docs` folder.
+**Automatic discovery (WiFi7, WiFi6 V2):** shortly after the restart a *Discovered* card appears under **Settings → Devices & services**. Click **Add**, give the thermostat a name and submit.
 
-\* Relay mode and the external sensor fallback exist on the WiFi7 only.
+**Manual (WiFi6 V1, or if discovery does not show up):**
+1. Go to **Settings → Devices & services → Add integration**.
+2. Search for **Heatit WiFi**.
+3. Enter a name for the thermostat and its local IP address (e.g. `192.168.1.50`; the `http://` prefix is optional).
+4. Submit. The integration verifies that the device answers before creating the entry.
+
+Give the thermostat a fixed IP (DHCP reservation) in your router if you can. The integration copes with address changes (see below) but a fixed address avoids the extra step.
+
+### Options
+Open the integration entry and click **Configure**:
+* **Polling interval** — 10 to 3600 seconds (default 60).
+* **Host** — change the IP/hostname after a DHCP lease change without removing the device. The same is available from the entry's **⋮ → Reconfigure** menu. When the thermostat is discoverable, a new IP is picked up automatically via mDNS.
+
+## Entities
+* **Climate:** Heat / Cool / Off modes, target temperature, Eco preset. The current temperature follows the sensor mode configured on the device (floor, internal or external sensor).
+* **Sensors (enabled by default):** current temperature, target temperature, power (W), energy (kWh).
+* **Sensors (disabled by default):** internal, external and floor temperatures; heating, cooling and eco setpoints; WiFi signal strength (dBm) and quality (%); IP address; open window remaining time.
+* **Binary sensors:** open window detected; open window detection enabled.
+* **Switches (configuration):** display measured temperature on the standby screen, child lock, open window detection. **WiFi7 Relay mode:** relay output, always on, inverted output.
+* **Buttons (configuration):** reset energy meter; reset settings to defaults (disabled by default, keeps WiFi credentials); factory reset (disabled by default — **also erases the WiFi credentials**, the thermostat must be re-provisioned with the Heatit app).
+* **Numbers (configuration):** floor minimum/maximum temperature limits (enabled by default — floor protection); disabled by default: internal/external temperature limits, hysteresis, active/standby display brightness, internal/floor/external sensor calibration, power regulator active time (PWER duty cycle), size of load, retry delay after an overload/overheat error, WiFi7 relay timers.
+* **Selects (configuration, disabled by default):** sensor mode (Floor / Internal / AF / External / A2F / Power regulator / Relay on WiFi7), regulation mode (Hysteresis / PWM), NTC sensor type (6.8–100 kΩ; the WiFi6 and WiFi7 number these differently, handled automatically), WiFi7 external sensor fallback and relay state after power loss.
+* Entities that do not apply to the current mode (e.g. thermostat settings while a WiFi7 runs in Relay mode) show as *unavailable* instead of *unknown*.
+* A disconnected floor/external NTC sensor (reported as exactly 100.0 °C by the firmware) shows as *unavailable* instead of 100 °C.
+* **Device page:** *Visit device* opens the thermostat's web UI; the WiFi MAC is listed under connections. **Diagnostics** downloads a redacted `/api/status` dump for bug reports.
+
+Disabled-by-default entities can be enabled per entity from the device page.
+
+## Migrating from the `heatit_wifi6` integration
+Version 2.0.0 renamed the integration from *Heatit WiFi6* (domain `heatit_wifi6`) to **Heatit WiFi** (domain `heatit_wifi`), since it supports the whole WiFi thermostat family. Home Assistant treats it as a new integration, so:
+1. Note the name(s) of your thermostat entries under the old integration.
+2. Delete the old entries (**Settings → Devices & services → Heatit WiFi6 → ⋮ → Delete**).
+3. Remove the old folder `config/custom_components/heatit_wifi6` (HACS: remove the old repository) and install this one as described above.
+4. Restart Home Assistant and add the thermostat(s) again **using the same names**. Entity IDs are derived from the name, so automations and dashboards keep working in the usual case. Re-enable any disabled-by-default entities you were using.
+
+## Troubleshooting
+* **Not discovered automatically:** WiFi6 V1 firmware does not advertise itself on mDNS — add it manually by IP. Discovery also requires Home Assistant and the thermostat to be on the same network segment (no VLAN/AP client isolation in between).
+* **"Cannot connect":** open `http://<thermostat-ip>/api/status` in a browser on the same network. If you get JSON, Home Assistant can reach it too. If not, check the IP in the Heatit app or your router.
+* **Device stopped updating after a router change:** the thermostat got a new IP. Use **⋮ → Reconfigure** on the entry (or wait for mDNS to update it automatically on WiFi7/WiFi6 V2).
+* **Floor/external temperature shows unavailable:** the sensor is disconnected or the wrong NTC type is selected (the firmware reports 100 °C in that case).
+* **A setting does not stick:** the firmware can briefly report the previous value after a write. The integration keeps the value you set until the next poll confirms it.
+* For bug reports use the [issue tracker](https://github.com/smarthomehellas/heatit_wifi/issues) and attach the diagnostics download from the device page (it is redacted).
 
 ## Development
-Unit tests mock the device API and run against a real Home Assistant core:
 ```bash
 pip install -r requirements_test.txt
 pytest
 ```
-`tests/test_integration.py` is the end-to-end check used by CI (a Prism mock of the OpenAPI spec plus a Home Assistant container) and is skipped by the default `pytest` run.
+Unit tests use `pytest-homeassistant-custom-component` with a mocked device and cover the WiFi6, WiFi7 and WiFi7 Relay mode payloads. `tests/test_integration.py` is the end-to-end check run by CI (a Prism mock of the WiFi6 OpenAPI spec in `custom_components/heatit_wifi/docs` plus a Home Assistant container) and is skipped by a plain `pytest` run. Every push is validated with hassfest and the HACS action.
 
-## Version History
-* **1.4.0**
+The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
+
+## Version history
+* **2.0.0**
+    * Integration renamed to **Heatit WiFi** (domain `heatit_wifi`) and moved to this repository, maintained by Smart Home Hellas. Existing `heatit_wifi6` users: see [Migrating](#migrating-from-the-heatit_wifi6-integration).
+    * Includes everything from the unreleased 1.4.0 below (zeroconf discovery, reconfigure, WiFi7 support incl. Relay mode, full parameter coverage, unit tests).
+    * CI: hassfest + HACS validation and unit tests on every push.
+* **1.4.0** (never published as a release — folded into 2.0.0)
     * Zeroconf discovery: WiFi7 firmware (confirmed on 0.1.13) advertises `directlink._tf._tcp` via mDNS, so Home Assistant now discovers the thermostat automatically — and when a known thermostat shows up on a new IP (DHCP lease change), the stored address is updated in place without any user action. Devices answering `_tf._tcp` without the Heatit local API are ignored silently.
     * Reconfigure support: change the device's address from the entry's ⋮ menu → *Reconfigure* (e.g. after a DHCP lease change) without removing and re-adding the integration. The flow verifies the new address answers and belongs to the same thermostat.
     * Unit tests (pytest-homeassistant-custom-component) for the number, select, switch, sensor and button platforms plus the config, options and reconfigure flows, covering the WiFi6, WiFi7 and WiFi7 Relay mode payloads.
@@ -105,7 +137,7 @@ pytest
 * **1.2.2**
     * Fixed climate entity and temperature missing due to async property getter.
 * **1.2.1**
-    * Fixed dual climate entity popping up 
+    * Fixed dual climate entity popping up
 * **1.2.0**
     * Fixed climate entity grouping with sensors under a single device.
 * **1.1.2**
@@ -118,5 +150,11 @@ pytest
 * **0.9.3**
     * Initial Release
 
+## Credits
+* [mattik-gh](https://github.com/mattik-gh/heatit_wifi6) — original `heatit_wifi6` integration (versions 0.9.3 – 1.2.x) and the WiFi6 OpenAPI document.
+* [lvlie](https://github.com/lvlie/heatit_wifi6) — sensor/binary-sensor split and HA developer-guideline alignment (1.3.x).
+* [atlehogberg](https://github.com/atlehogberg) and [vlad-323](https://github.com/vlad-323) — fixes and improvements merged upstream.
+* [Smart Home Hellas](mailto:info@smarthomehellas.gr) (Thanos Kasolas) — WiFi7 support, discovery, reconfigure, parameter coverage, tests and maintenance since 2026.
+
 ## License
-This software is licensed under the [MIT License](LICENSE.md).
+[MIT](LICENSE.md).

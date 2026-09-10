@@ -3,3 +3,6 @@ __pycache__/
 *$py.class
 .pytest_cache/
 .coverage
+desktop.ini
+Thumbs.db
+.DS_Store

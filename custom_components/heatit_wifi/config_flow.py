@@ -1,4 +1,4 @@
-"""Config flow for the Heatit WiFi6 integration."""
+"""Config flow for the Heatit WiFi integration."""
 from __future__ import annotations
 
 import logging
@@ -18,7 +18,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from .api import HeatitWiFi6API
+from .api import HeatitWiFiAPI
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,8 +37,8 @@ def _normalize_host(host: str) -> str:
     return host.rstrip("/")
 
 
-class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Handle the user-driven config flow for Heatit WiFi6 thermostats."""
+class HeatitWiFiConfigFlow(ConfigFlow, domain=DOMAIN):
+    """Handle the user-driven config flow for Heatit WiFi thermostats."""
 
     VERSION = 1
 
@@ -50,9 +50,9 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(
         config_entry: ConfigEntry,
-    ) -> HeatitWiFi6OptionsFlow:
+    ) -> HeatitWiFiOptionsFlow:
         """Create the options flow."""
-        return HeatitWiFi6OptionsFlow()
+        return HeatitWiFiOptionsFlow()
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -65,7 +65,7 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
             user_input[CONF_HOST] = host
 
             session = async_get_clientsession(self.hass)
-            api = HeatitWiFi6API(host, session)
+            api = HeatitWiFiAPI(host, session)
             device_id = await api.get_device_id(retries=1, timeout=10)
 
             if device_id == "unknown":
@@ -74,11 +74,11 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(device_id)
                 self._abort_if_unique_id_configured()
                 _LOGGER.debug(
-                    "Adding Heatit WiFi6 device id=%s name=%s host=%s",
+                    "Adding Heatit WiFi device id=%s name=%s host=%s",
                     device_id, user_input[CONF_NAME], host,
                 )
                 return self.async_create_entry(
-                    title=f"Heatit WiFi6 ({user_input[CONF_NAME]})",
+                    title=f"Heatit WiFi ({user_input[CONF_NAME]})",
                     data=user_input,
                 )
 
@@ -101,7 +101,7 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
         host = _normalize_host(str(discovery_info.ip_address))
 
         session = async_get_clientsession(self.hass)
-        api = HeatitWiFi6API(host, session)
+        api = HeatitWiFiAPI(host, session)
         device_id = await api.get_device_id(retries=1, timeout=10)
         if device_id == "unknown":
             return self.async_abort(reason="cannot_connect")
@@ -123,7 +123,7 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             return self.async_create_entry(
-                title=f"Heatit WiFi6 ({user_input[CONF_NAME]})",
+                title=f"Heatit WiFi ({user_input[CONF_NAME]})",
                 data={
                     CONF_NAME: user_input[CONF_NAME],
                     CONF_HOST: self._discovered_host,
@@ -147,7 +147,7 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
             host = _normalize_host(user_input[CONF_HOST])
 
             session = async_get_clientsession(self.hass)
-            api = HeatitWiFi6API(host, session)
+            api = HeatitWiFiAPI(host, session)
             device_id = await api.get_device_id(retries=1, timeout=10)
 
             if device_id == "unknown":
@@ -174,7 +174,7 @@ class HeatitWiFi6ConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
 
-class HeatitWiFi6OptionsFlow(OptionsFlow):
+class HeatitWiFiOptionsFlow(OptionsFlow):
     """Change the polling interval or the device's address."""
 
     async def async_step_init(
@@ -189,7 +189,7 @@ class HeatitWiFi6OptionsFlow(OptionsFlow):
 
             if host != entry.data[CONF_HOST]:
                 session = async_get_clientsession(self.hass)
-                api = HeatitWiFi6API(host, session)
+                api = HeatitWiFiAPI(host, session)
                 device_id = await api.get_device_id(retries=1, timeout=10)
                 if device_id == "unknown":
                     errors["base"] = "cannot_connect"

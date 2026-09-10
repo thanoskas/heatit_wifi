@@ -28,13 +28,13 @@ def main():
             print("Log file not found.")
         sys.exit(1)
 
-    print("Checking Home Assistant logs for Heatit WiFi6 initialization...")
+    print("Checking Home Assistant logs for Heatit WiFi initialization...")
     entity_loaded = False
     for _ in range(15):
         try:
             with open(LOG_PATH, "r") as f:
                 logs = f.read()
-                if "Heatit WiFi6" in logs and "added to the list of entities" in logs:
+                if "Heatit WiFi" in logs and "added to the list of entities" in logs:
                     entity_loaded = True
                     break
         except FileNotFoundError:

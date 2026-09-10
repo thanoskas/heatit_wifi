@@ -1,4 +1,4 @@
-"""Number platform for the Heatit WiFi6 thermostat."""
+"""Number platform for the Heatit WiFi thermostat."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -23,14 +23,14 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import HeatitWiFi6ConfigEntry
-from .api import HeatitWiFi6API
-from .entity import HeatitWiFi6Entity
+from . import HeatitWiFiConfigEntry
+from .api import HeatitWiFiAPI
+from .entity import HeatitWiFiEntity
 
 
 @dataclass(frozen=True, kw_only=True)
-class HeatitWiFi6NumberEntityDescription(NumberEntityDescription):
-    """Describe a Heatit WiFi6 number backed by a device parameter."""
+class HeatitWiFiNumberEntityDescription(NumberEntityDescription):
+    """Describe a Heatit WiFi number backed by a device parameter."""
 
     parameter: str
     value_fn: Callable[[dict[str, Any]], float | None]
@@ -63,8 +63,8 @@ def _action_after_error_payload(value: float) -> int:
 
 def _temperature_limit(
     key: str, parameter: str, *, enabled: bool = False
-) -> HeatitWiFi6NumberEntityDescription:
-    return HeatitWiFi6NumberEntityDescription(
+) -> HeatitWiFiNumberEntityDescription:
+    return HeatitWiFiNumberEntityDescription(
         key=key,
         translation_key=key,
         entity_category=EntityCategory.CONFIG,
@@ -82,9 +82,9 @@ def _temperature_limit(
 
 def _duration(
     key: str, parameter: str, max_value: int
-) -> HeatitWiFi6NumberEntityDescription:
+) -> HeatitWiFiNumberEntityDescription:
     # WiFi7 Relay mode timers, in seconds (0 = disabled).
-    return HeatitWiFi6NumberEntityDescription(
+    return HeatitWiFiNumberEntityDescription(
         key=key,
         translation_key=key,
         entity_category=EntityCategory.CONFIG,
@@ -114,8 +114,8 @@ def _dual_parameter_field(
 
 def _calibration(
     key: str, parameter: str, alt_parameter: str
-) -> HeatitWiFi6NumberEntityDescription:
-    return HeatitWiFi6NumberEntityDescription(
+) -> HeatitWiFiNumberEntityDescription:
+    return HeatitWiFiNumberEntityDescription(
         key=key,
         translation_key=key,
         entity_category=EntityCategory.CONFIG,
@@ -135,10 +135,10 @@ def _calibration(
 BRIGHTNESS_KEYS = {"active_display_brightness", "standby_display_brightness"}
 
 
-def _brightness(key: str, parameter: str) -> HeatitWiFi6NumberEntityDescription:
+def _brightness(key: str, parameter: str) -> HeatitWiFiNumberEntityDescription:
     # WiFi6 uses a 1-10 scale (x10%); WiFi7 firmware reports 0-100 in
     # steps of 10. The entity switches scale based on the reported value.
-    return HeatitWiFi6NumberEntityDescription(
+    return HeatitWiFiNumberEntityDescription(
         key=key,
         translation_key=key,
         entity_category=EntityCategory.CONFIG,
@@ -152,8 +152,8 @@ def _brightness(key: str, parameter: str) -> HeatitWiFi6NumberEntityDescription:
     )
 
 
-NUMBER_DESCRIPTIONS: tuple[HeatitWiFi6NumberEntityDescription, ...] = (
-    HeatitWiFi6NumberEntityDescription(
+NUMBER_DESCRIPTIONS: tuple[HeatitWiFiNumberEntityDescription, ...] = (
+    HeatitWiFiNumberEntityDescription(
         key="hysteresis",
         translation_key="hysteresis",
         entity_category=EntityCategory.CONFIG,
@@ -172,7 +172,7 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFi6NumberEntityDescription, ...] = (
     _calibration("internal_calibration", "internalCalibration", "internalSensorCalibration"),
     _calibration("floor_calibration", "floorCalibration", "floorSensorCalibration"),
     _calibration("external_calibration", "externalCalibration", "externalSensorCalibration"),
-    HeatitWiFi6NumberEntityDescription(
+    HeatitWiFiNumberEntityDescription(
         key="power_regulator_active_time",
         translation_key="power_regulator_active_time",
         entity_category=EntityCategory.CONFIG,
@@ -193,7 +193,7 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFi6NumberEntityDescription, ...] = (
     _temperature_limit("internal_max_temperature", "internalMaximumTemperatureLimit"),
     _temperature_limit("external_min_temperature", "externalMinimumTemperatureLimit"),
     _temperature_limit("external_max_temperature", "externalMaximumTemperatureLimit"),
-    HeatitWiFi6NumberEntityDescription(
+    HeatitWiFiNumberEntityDescription(
         key="size_of_load",
         translation_key="size_of_load",
         entity_category=EntityCategory.CONFIG,
@@ -208,7 +208,7 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFi6NumberEntityDescription, ...] = (
         value_fn=_size_of_load,
         payload_fn=lambda value: int(round(value / 100)),
     ),
-    HeatitWiFi6NumberEntityDescription(
+    HeatitWiFiNumberEntityDescription(
         key="action_after_error",
         translation_key="action_after_error",
         entity_category=EntityCategory.CONFIG,
@@ -231,10 +231,10 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFi6NumberEntityDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: HeatitWiFi6ConfigEntry,
+    entry: HeatitWiFiConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Heatit WiFi6 numbers from a config entry."""
+    """Set up the Heatit WiFi numbers from a config entry."""
     data = entry.runtime_data
     name = entry.data[CONF_NAME]
     # WiFi7-only parameters are skipped on a WiFi6 (which reports no
@@ -244,7 +244,7 @@ async def async_setup_entry(
         (status.get("parameters") or {}).get("sensorMode") == 7
     )
     async_add_entities(
-        HeatitWiFi6Number(
+        HeatitWiFiNumber(
             data.coordinator, data.api, name, data.device_id, description
         )
         for description in NUMBER_DESCRIPTIONS
@@ -252,24 +252,24 @@ async def async_setup_entry(
     )
 
 
-class HeatitWiFi6Number(HeatitWiFi6Entity, NumberEntity):
-    """A Heatit WiFi6 number that adjusts a numeric device parameter."""
+class HeatitWiFiNumber(HeatitWiFiEntity, NumberEntity):
+    """A Heatit WiFi number that adjusts a numeric device parameter."""
 
-    entity_description: HeatitWiFi6NumberEntityDescription
+    entity_description: HeatitWiFiNumberEntityDescription
 
     def __init__(
         self,
         coordinator,
-        api: HeatitWiFi6API,
+        api: HeatitWiFiAPI,
         device_name: str,
         device_id: str,
-        description: HeatitWiFi6NumberEntityDescription,
+        description: HeatitWiFiNumberEntityDescription,
     ) -> None:
         """Initialize the number."""
         super().__init__(coordinator, device_name, device_id)
         self.entity_description = description
         self._api = api
-        self._attr_unique_id = f"heatit_wifi6_{device_id}_{description.key}"
+        self._attr_unique_id = f"heatit_wifi_{device_id}_{description.key}"
 
     @property
     def available(self) -> bool:

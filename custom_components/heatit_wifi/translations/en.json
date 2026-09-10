@@ -1,5 +1,5 @@
 {
-   "title": "Heatit WiFi6 Thermostat",
+   "title": "Heatit WiFi",
    "config": {
       "error": {
          "cannot_connect": "Connect failed. Please check the address. It should contain only the URL base address. E.g. http://192.168.10.5",
@@ -14,7 +14,7 @@
       "flow_title": "Heatit thermostat at {host}",
       "step": {
          "user": {
-            "title": "Configure Heatit WiFi6",
+            "title": "Configure Heatit WiFi",
             "description": "Enter a short name and base URL for the thermostat.",
             "data": {
                "name": "Name",
@@ -44,7 +44,7 @@
       },
       "step": {
          "init": {
-            "title": "Heatit WiFi6 options",
+            "title": "Heatit WiFi options",
             "data": {
                "host": "Device base URL (e.g. http://192.168.10.5)",
                "scan_interval": "Polling interval (seconds)"

@@ -28,9 +28,9 @@ sys.modules["aiohttp"] = mock_aiohttp
 import aiohttp
 
 # Mock the constants to avoid import errors from .const
-sys.modules["custom_components.heatit_wifi6.const"] = MagicMock()
+sys.modules["custom_components.heatit_wifi.const"] = MagicMock()
 
-from custom_components.heatit_wifi6.api import HeatitWiFi6API
+from custom_components.heatit_wifi.api import HeatitWiFiAPI
 
 class MockResponse:
     def __init__(self, text_data="{}", fail_attempts=0):
@@ -72,7 +72,7 @@ async def test_api_behavior():
     mock_aiohttp.resolver.ThreadedResolver = MagicMock()
     mock_aiohttp.TCPConnector.return_value = MagicMock()
 
-    api = HeatitWiFi6API("http://localhost")
+    api = HeatitWiFiAPI("http://localhost")
 
     # Test Case 1: Success on first attempt
     print("Test 1: Success on first attempt")
@@ -86,7 +86,7 @@ async def test_api_behavior():
     print("Test 2: Success after 1 retry")
     resp = MockResponse(text_data='{"status": "Success"}', fail_attempts=1)
     mock_aiohttp.ClientSession.return_value = MockSession(resp)
-    with patch("custom_components.heatit_wifi6.api.asyncio.sleep", AsyncMock()):
+    with patch("custom_components.heatit_wifi.api.asyncio.sleep", AsyncMock()):
         result = await api._get("/test", retries=1)
         assert result == {"status": "Success"}
     print("  Success!")
@@ -95,7 +95,7 @@ async def test_api_behavior():
     print("Test 3: Failure after all retries")
     resp = MockResponse(text_data='{"status": "Success"}', fail_attempts=3)
     mock_aiohttp.ClientSession.return_value = MockSession(resp)
-    with patch("custom_components.heatit_wifi6.api.asyncio.sleep", AsyncMock()):
+    with patch("custom_components.heatit_wifi.api.asyncio.sleep", AsyncMock()):
         result = await api._post("/test", {"data": "test"}, retries=2)
         assert result == {}
     print("  Success!")
@@ -104,7 +104,7 @@ async def test_api_behavior():
     print("Test 4: Delete with retries")
     resp = MockResponse(text_data='{"status": "Deleted"}', fail_attempts=1)
     mock_aiohttp.ClientSession.return_value = MockSession(resp)
-    with patch("custom_components.heatit_wifi6.api.asyncio.sleep", AsyncMock()):
+    with patch("custom_components.heatit_wifi.api.asyncio.sleep", AsyncMock()):
         result = await api._delete("/test", retries=1)
         assert result == {"status": "Deleted"}
     print("  Success!")
@@ -113,7 +113,7 @@ async def test_api_behavior():
     print("Test 5: External session usage")
     ext_resp = MockResponse(text_data='{"status": "Ext"}')
     ext_session = MockSession(ext_resp)
-    api_ext = HeatitWiFi6API("http://localhost", session=ext_session)
+    api_ext = HeatitWiFiAPI("http://localhost", session=ext_session)
     mock_aiohttp.ClientSession.reset_mock()
     result = await api_ext._get("/test")
     assert result == {"status": "Ext"}

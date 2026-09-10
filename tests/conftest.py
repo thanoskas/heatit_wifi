@@ -1,6 +1,6 @@
-"""Fixtures for the Heatit WiFi6 unit tests.
+"""Fixtures for the Heatit WiFi unit tests.
 
-The device API is mocked at the ``HeatitWiFi6API`` boundary, so these tests
+The device API is mocked at the ``HeatitWiFiAPI`` boundary, so these tests
 exercise the coordinator, the entity platforms and the write paths without
 touching the network. They need ``pytest-homeassistant-custom-component``.
 """
@@ -16,7 +16,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME
 from homeassistant.core import HomeAssistant
 
-from custom_components.heatit_wifi6.const import DOMAIN
+from custom_components.heatit_wifi.const import DOMAIN
 
 DEVICE_ID = "8E6EDC28A7D0"
 DEVICE_NAME = "Lab thermostat"
@@ -149,19 +149,19 @@ def mock_api(status: dict[str, Any]):
     """Mock the device API so no HTTP requests are made."""
     with (
         patch(
-            "custom_components.heatit_wifi6.HeatitWiFi6API.get_device_id",
+            "custom_components.heatit_wifi.HeatitWiFiAPI.get_device_id",
             new=AsyncMock(return_value=status["id"]),
         ),
         patch(
-            "custom_components.heatit_wifi6.HeatitWiFi6API.get_status",
+            "custom_components.heatit_wifi.HeatitWiFiAPI.get_status",
             new=AsyncMock(return_value=status),
         ) as get_status,
         patch(
-            "custom_components.heatit_wifi6.HeatitWiFi6API.set_parameter",
+            "custom_components.heatit_wifi.HeatitWiFiAPI.set_parameter",
             new=AsyncMock(return_value={"status": "Success"}),
         ) as set_parameter,
         patch(
-            "custom_components.heatit_wifi6.HeatitWiFi6API.reset_device",
+            "custom_components.heatit_wifi.HeatitWiFiAPI.reset_device",
             new=AsyncMock(return_value={"status": "success"}),
         ) as reset_device,
     ):

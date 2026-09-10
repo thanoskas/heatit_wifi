@@ -1,4 +1,4 @@
-"""Sensor platform for the Heatit WiFi6 thermostat."""
+"""Sensor platform for the Heatit WiFi thermostat."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -24,14 +24,14 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import HeatitWiFi6ConfigEntry
+from . import HeatitWiFiConfigEntry
 from .const import NTC_FAULT_TEMPERATURE
-from .entity import HeatitWiFi6Entity
+from .entity import HeatitWiFiEntity
 
 
 @dataclass(frozen=True, kw_only=True)
-class HeatitWiFi6SensorEntityDescription(SensorEntityDescription):
-    """Describe a Heatit WiFi6 sensor."""
+class HeatitWiFiSensorEntityDescription(SensorEntityDescription):
+    """Describe a Heatit WiFi sensor."""
 
     value_fn: Callable[[dict[str, Any]], Any]
 
@@ -100,8 +100,8 @@ def _wifi_quality(data: dict[str, Any]) -> int | None:
     return max(0, min(100, 2 * (rssi + 100)))
 
 
-SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
-    HeatitWiFi6SensorEntityDescription(
+SENSOR_DESCRIPTIONS: tuple[HeatitWiFiSensorEntityDescription, ...] = (
+    HeatitWiFiSensorEntityDescription(
         key="current_temperature",
         translation_key="current_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -109,7 +109,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=_current_temperature,
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="target_temperature",
         translation_key="target_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -117,7 +117,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=_target_temperature,
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="power",
         translation_key="power",
         device_class=SensorDeviceClass.POWER,
@@ -125,7 +125,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: data.get("currentPower"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="energy",
         translation_key="energy",
         device_class=SensorDeviceClass.ENERGY,
@@ -133,7 +133,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         value_fn=lambda data: data.get("totalConsumption"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="internal_temperature",
         translation_key="internal_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -142,7 +142,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=lambda data: data.get("internalTemperature"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="external_temperature",
         translation_key="external_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -151,7 +151,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=lambda data: _ntc_temperature(data, "externalTemperature"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="floor_temperature",
         translation_key="floor_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -160,7 +160,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=lambda data: _ntc_temperature(data, "floorTemperature"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="heating_setpoint",
         translation_key="heating_setpoint",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -169,7 +169,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=_param("heatingSetpoint"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="cooling_setpoint",
         translation_key="cooling_setpoint",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -178,7 +178,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=_param("coolingSetpoint"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="eco_setpoint",
         translation_key="eco_setpoint",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -187,7 +187,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=_param("ecoSetpoint"),
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="open_window_remaining_time",
         translation_key="open_window_remaining_time",
         device_class=SensorDeviceClass.DURATION,
@@ -195,7 +195,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=_owd_remaining_time,
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="wifi_signal_strength",
         translation_key="wifi_signal_strength",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
@@ -205,7 +205,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=_wifi_signal,
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="wifi_signal_quality",
         translation_key="wifi_signal_quality",
         native_unit_of_measurement=PERCENTAGE,
@@ -215,7 +215,7 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
         icon="mdi:wifi",
         value_fn=_wifi_quality,
     ),
-    HeatitWiFi6SensorEntityDescription(
+    HeatitWiFiSensorEntityDescription(
         key="ip_address",
         translation_key="ip_address",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -228,34 +228,34 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFi6SensorEntityDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: HeatitWiFi6ConfigEntry,
+    entry: HeatitWiFiConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Heatit WiFi6 sensors from a config entry."""
+    """Set up the Heatit WiFi sensors from a config entry."""
     data = entry.runtime_data
     name = entry.data[CONF_NAME]
     async_add_entities(
-        HeatitWiFi6Sensor(data.coordinator, name, data.device_id, description)
+        HeatitWiFiSensor(data.coordinator, name, data.device_id, description)
         for description in SENSOR_DESCRIPTIONS
     )
 
 
-class HeatitWiFi6Sensor(HeatitWiFi6Entity, SensorEntity):
-    """A Heatit WiFi6 sensor backed by a SensorEntityDescription."""
+class HeatitWiFiSensor(HeatitWiFiEntity, SensorEntity):
+    """A Heatit WiFi sensor backed by a SensorEntityDescription."""
 
-    entity_description: HeatitWiFi6SensorEntityDescription
+    entity_description: HeatitWiFiSensorEntityDescription
 
     def __init__(
         self,
         coordinator,
         device_name: str,
         device_id: str,
-        description: HeatitWiFi6SensorEntityDescription,
+        description: HeatitWiFiSensorEntityDescription,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, device_name, device_id)
         self.entity_description = description
-        self._attr_unique_id = f"heatit_wifi6_{device_id}_{description.key}"
+        self._attr_unique_id = f"heatit_wifi_{device_id}_{description.key}"
 
     @property
     def native_value(self) -> Any:

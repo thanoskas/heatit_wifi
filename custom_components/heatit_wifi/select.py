@@ -1,4 +1,4 @@
-"""Select platform for the Heatit WiFi6 thermostat."""
+"""Select platform for the Heatit WiFi thermostat."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -11,14 +11,14 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import HeatitWiFi6ConfigEntry
-from .api import HeatitWiFi6API
-from .entity import HeatitWiFi6Entity
+from . import HeatitWiFiConfigEntry
+from .api import HeatitWiFiAPI
+from .entity import HeatitWiFiEntity
 
 
 @dataclass(frozen=True, kw_only=True)
-class HeatitWiFi6SelectEntityDescription(SelectEntityDescription):
-    """Describe a Heatit WiFi6 select backed by an enumerated parameter."""
+class HeatitWiFiSelectEntityDescription(SelectEntityDescription):
+    """Describe a Heatit WiFi select backed by an enumerated parameter."""
 
     parameter: str
     # Maps the raw API value to an option key. Takes the status payload
@@ -102,8 +102,8 @@ def _sensor_value_options(data: dict[str, Any]) -> dict[int, str]:
     return SENSOR_VALUE_OPTIONS_WIFI7 if _is_wifi7(data) else SENSOR_VALUE_OPTIONS_WIFI6
 
 
-SELECT_DESCRIPTIONS: tuple[HeatitWiFi6SelectEntityDescription, ...] = (
-    HeatitWiFi6SelectEntityDescription(
+SELECT_DESCRIPTIONS: tuple[HeatitWiFiSelectEntityDescription, ...] = (
+    HeatitWiFiSelectEntityDescription(
         key="sensor_mode",
         translation_key="sensor_mode",
         entity_category=EntityCategory.CONFIG,
@@ -112,7 +112,7 @@ SELECT_DESCRIPTIONS: tuple[HeatitWiFi6SelectEntityDescription, ...] = (
         parameter="sensorMode",
         options_fn=_static(SENSOR_MODE_OPTIONS),
     ),
-    HeatitWiFi6SelectEntityDescription(
+    HeatitWiFiSelectEntityDescription(
         key="regulation_mode",
         translation_key="regulation_mode",
         entity_category=EntityCategory.CONFIG,
@@ -122,7 +122,7 @@ SELECT_DESCRIPTIONS: tuple[HeatitWiFi6SelectEntityDescription, ...] = (
         options_fn=_static(REGULATION_MODE_OPTIONS),
         payload_fn=bool,
     ),
-    HeatitWiFi6SelectEntityDescription(
+    HeatitWiFiSelectEntityDescription(
         key="sensor_value",
         translation_key="sensor_value",
         entity_category=EntityCategory.CONFIG,
@@ -131,7 +131,7 @@ SELECT_DESCRIPTIONS: tuple[HeatitWiFi6SelectEntityDescription, ...] = (
         parameter="sensorValue",
         options_fn=_sensor_value_options,
     ),
-    HeatitWiFi6SelectEntityDescription(
+    HeatitWiFiSelectEntityDescription(
         key="external_sensor_fallback",
         translation_key="external_sensor_fallback",
         entity_category=EntityCategory.CONFIG,
@@ -141,7 +141,7 @@ SELECT_DESCRIPTIONS: tuple[HeatitWiFi6SelectEntityDescription, ...] = (
         options_fn=_static(EXTERNAL_SENSOR_FALLBACK_OPTIONS),
         wifi7_only=True,
     ),
-    HeatitWiFi6SelectEntityDescription(
+    HeatitWiFiSelectEntityDescription(
         key="device_restore_state",
         translation_key="device_restore_state",
         entity_category=EntityCategory.CONFIG,
@@ -156,10 +156,10 @@ SELECT_DESCRIPTIONS: tuple[HeatitWiFi6SelectEntityDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: HeatitWiFi6ConfigEntry,
+    entry: HeatitWiFiConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Heatit WiFi6 selects from a config entry."""
+    """Set up the Heatit WiFi selects from a config entry."""
     data = entry.runtime_data
     name = entry.data[CONF_NAME]
     status = data.coordinator.data or {}
@@ -167,30 +167,30 @@ async def async_setup_entry(
         (status.get("parameters") or {}).get("sensorMode") == 7
     )
     async_add_entities(
-        HeatitWiFi6Select(data.coordinator, data.api, name, data.device_id, description)
+        HeatitWiFiSelect(data.coordinator, data.api, name, data.device_id, description)
         for description in SELECT_DESCRIPTIONS
         if is_wifi7 or not description.wifi7_only
     )
 
 
-class HeatitWiFi6Select(HeatitWiFi6Entity, SelectEntity):
-    """A Heatit WiFi6 select that sets an enumerated device parameter."""
+class HeatitWiFiSelect(HeatitWiFiEntity, SelectEntity):
+    """A Heatit WiFi select that sets an enumerated device parameter."""
 
-    entity_description: HeatitWiFi6SelectEntityDescription
+    entity_description: HeatitWiFiSelectEntityDescription
 
     def __init__(
         self,
         coordinator,
-        api: HeatitWiFi6API,
+        api: HeatitWiFiAPI,
         device_name: str,
         device_id: str,
-        description: HeatitWiFi6SelectEntityDescription,
+        description: HeatitWiFiSelectEntityDescription,
     ) -> None:
         """Initialize the select."""
         super().__init__(coordinator, device_name, device_id)
         self.entity_description = description
         self._api = api
-        self._attr_unique_id = f"heatit_wifi6_{device_id}_{description.key}"
+        self._attr_unique_id = f"heatit_wifi_{device_id}_{description.key}"
 
     @property
     def available(self) -> bool:

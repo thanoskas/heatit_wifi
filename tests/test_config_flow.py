@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from custom_components.heatit_wifi6.const import DOMAIN
+from custom_components.heatit_wifi.const import DOMAIN
 
 from .conftest import DEVICE_ID, DEVICE_NAME
 
@@ -36,7 +36,7 @@ def _discovery_info(ip: str = "192.168.1.17") -> ZeroconfServiceInfo:
 def _patch_device_id(value: str):
     """Control what the flow's connectivity probe returns."""
     return patch(
-        "custom_components.heatit_wifi6.config_flow.HeatitWiFi6API.get_device_id",
+        "custom_components.heatit_wifi.config_flow.HeatitWiFiAPI.get_device_id",
         new=AsyncMock(return_value=value),
     )
 
@@ -45,7 +45,7 @@ def _patch_device_id(value: str):
 def mock_setup_entry():
     """Skip the real setup when a flow creates or reloads an entry."""
     with patch(
-        "custom_components.heatit_wifi6.async_setup_entry", return_value=True
+        "custom_components.heatit_wifi.async_setup_entry", return_value=True
     ) as mock:
         yield mock
 
@@ -53,7 +53,7 @@ def mock_setup_entry():
 def _make_entry(hass: HomeAssistant) -> MockConfigEntry:
     entry = MockConfigEntry(
         domain=DOMAIN,
-        title=f"Heatit WiFi6 ({DEVICE_NAME})",
+        title=f"Heatit WiFi ({DEVICE_NAME})",
         unique_id=DEVICE_ID,
         data={CONF_HOST: "http://192.168.1.50", CONF_NAME: DEVICE_NAME},
     )
@@ -78,7 +78,7 @@ async def test_user_flow_creates_entry(
     await hass.async_block_till_done()
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == f"Heatit WiFi6 ({DEVICE_NAME})"
+    assert result["title"] == f"Heatit WiFi ({DEVICE_NAME})"
     # The host is normalized: scheme added, trailing slash stripped.
     assert result["data"][CONF_HOST] == "http://192.168.1.50"
     assert result["result"].unique_id == DEVICE_ID
@@ -207,7 +207,7 @@ async def test_zeroconf_discovers_new_device(
     await hass.async_block_till_done()
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == f"Heatit WiFi6 ({DEVICE_NAME})"
+    assert result["title"] == f"Heatit WiFi ({DEVICE_NAME})"
     assert result["data"] == {
         CONF_NAME: DEVICE_NAME,
         CONF_HOST: "http://192.168.1.17",

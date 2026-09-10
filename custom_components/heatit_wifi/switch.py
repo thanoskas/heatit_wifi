@@ -1,4 +1,4 @@
-"""Switch platform for the Heatit WiFi6 thermostat."""
+"""Switch platform for the Heatit WiFi thermostat."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -15,14 +15,14 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import HeatitWiFi6ConfigEntry
-from .api import HeatitWiFi6API
-from .entity import HeatitWiFi6Entity
+from . import HeatitWiFiConfigEntry
+from .api import HeatitWiFiAPI
+from .entity import HeatitWiFiEntity
 
 
 @dataclass(frozen=True, kw_only=True)
-class HeatitWiFi6SwitchEntityDescription(SwitchEntityDescription):
-    """Describe a Heatit WiFi6 switch backed by a device parameter."""
+class HeatitWiFiSwitchEntityDescription(SwitchEntityDescription):
+    """Describe a Heatit WiFi switch backed by a device parameter."""
 
     parameter: str
     value_fn: Callable[[dict[str, Any]], bool | None]
@@ -57,8 +57,8 @@ def _set_owd_local(data: dict[str, Any], value: Any) -> None:
     owd["openWindowDetection"] = value
 
 
-SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
-    HeatitWiFi6SwitchEntityDescription(
+SWITCH_DESCRIPTIONS: tuple[HeatitWiFiSwitchEntityDescription, ...] = (
+    HeatitWiFiSwitchEntityDescription(
         key="temperature_display",
         translation_key="temperature_display",
         entity_category=EntityCategory.CONFIG,
@@ -66,7 +66,7 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
         parameter="temperatureDisplay",
         value_fn=_parameter_field("temperatureDisplay"),
     ),
-    HeatitWiFi6SwitchEntityDescription(
+    HeatitWiFiSwitchEntityDescription(
         key="child_lock",
         translation_key="child_lock",
         entity_category=EntityCategory.CONFIG,
@@ -75,7 +75,7 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
         value_fn=_parameter_field("disableButtons"),
         payload_fn=int,
     ),
-    HeatitWiFi6SwitchEntityDescription(
+    HeatitWiFiSwitchEntityDescription(
         key="open_window_detection",
         translation_key="open_window_detection",
         entity_category=EntityCategory.CONFIG,
@@ -85,7 +85,7 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
         set_local=_set_owd_local,
     ),
     # WiFi7 Relay mode extras.
-    HeatitWiFi6SwitchEntityDescription(
+    HeatitWiFiSwitchEntityDescription(
         key="always_on",
         translation_key="always_on",
         entity_category=EntityCategory.CONFIG,
@@ -95,7 +95,7 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
         value_fn=_parameter_field("alwaysOn"),
         wifi7_only=True,
     ),
-    HeatitWiFi6SwitchEntityDescription(
+    HeatitWiFiSwitchEntityDescription(
         key="inverted_output",
         translation_key="inverted_output",
         entity_category=EntityCategory.CONFIG,
@@ -110,10 +110,10 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFi6SwitchEntityDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: HeatitWiFi6ConfigEntry,
+    entry: HeatitWiFiConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the Heatit WiFi6 switches from a config entry."""
+    """Set up the Heatit WiFi switches from a config entry."""
     data = entry.runtime_data
     name = entry.data[CONF_NAME]
     # WiFi7-only entities are skipped on a WiFi6 (which reports no model
@@ -124,7 +124,7 @@ async def async_setup_entry(
         (status.get("parameters") or {}).get("sensorMode") == 7
     )
     entities: list[SwitchEntity] = [
-        HeatitWiFi6Switch(
+        HeatitWiFiSwitch(
             data.coordinator, data.api, name, data.device_id, description
         )
         for description in SWITCH_DESCRIPTIONS
@@ -132,30 +132,30 @@ async def async_setup_entry(
     ]
     if is_wifi7:
         entities.append(
-            HeatitWiFi6RelaySwitch(data.coordinator, data.api, name, data.device_id)
+            HeatitWiFiRelaySwitch(data.coordinator, data.api, name, data.device_id)
         )
 
     async_add_entities(entities)
 
 
-class HeatitWiFi6Switch(HeatitWiFi6Entity, SwitchEntity):
-    """A Heatit WiFi6 switch that toggles a boolean device parameter."""
+class HeatitWiFiSwitch(HeatitWiFiEntity, SwitchEntity):
+    """A Heatit WiFi switch that toggles a boolean device parameter."""
 
-    entity_description: HeatitWiFi6SwitchEntityDescription
+    entity_description: HeatitWiFiSwitchEntityDescription
 
     def __init__(
         self,
         coordinator,
-        api: HeatitWiFi6API,
+        api: HeatitWiFiAPI,
         device_name: str,
         device_id: str,
-        description: HeatitWiFi6SwitchEntityDescription,
+        description: HeatitWiFiSwitchEntityDescription,
     ) -> None:
         """Initialize the switch."""
         super().__init__(coordinator, device_name, device_id)
         self.entity_description = description
         self._api = api
-        self._attr_unique_id = f"heatit_wifi6_{device_id}_{description.key}"
+        self._attr_unique_id = f"heatit_wifi_{device_id}_{description.key}"
 
     @property
     def available(self) -> bool:
@@ -206,7 +206,7 @@ class HeatitWiFi6Switch(HeatitWiFi6Entity, SwitchEntity):
             await self.coordinator.async_request_refresh()
 
 
-class HeatitWiFi6RelaySwitch(HeatitWiFi6Entity, SwitchEntity):
+class HeatitWiFiRelaySwitch(HeatitWiFiEntity, SwitchEntity):
     """The relay output of a WiFi7 running in Relay mode (RELA)."""
 
     _attr_translation_key = "relay"
@@ -215,14 +215,14 @@ class HeatitWiFi6RelaySwitch(HeatitWiFi6Entity, SwitchEntity):
     def __init__(
         self,
         coordinator,
-        api: HeatitWiFi6API,
+        api: HeatitWiFiAPI,
         device_name: str,
         device_id: str,
     ) -> None:
         """Initialize the relay switch."""
         super().__init__(coordinator, device_name, device_id)
         self._api = api
-        self._attr_unique_id = f"heatit_wifi6_{device_id}_relay"
+        self._attr_unique_id = f"heatit_wifi_{device_id}_relay"
 
     @property
     def available(self) -> bool:

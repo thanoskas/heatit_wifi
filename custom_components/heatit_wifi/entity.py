@@ -1,4 +1,4 @@
-"""Shared entity base for the Heatit WiFi6 integration."""
+"""Shared entity base for the Heatit WiFi integration."""
 from __future__ import annotations
 
 from typing import Any
@@ -12,7 +12,7 @@ from homeassistant.helpers.update_coordinator import (
 from .const import DOMAIN
 
 
-class HeatitWiFi6Entity(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]]]):
+class HeatitWiFiEntity(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]]]):
     """Base entity that ties Heatit entities to a single device."""
 
     _attr_has_entity_name = True

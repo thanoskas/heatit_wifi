@@ -20,19 +20,19 @@ jobs:
 
       - name: Start Mock API
         run: |
-          npx -y @stoplight/prism-cli mock custom_components/heatit_wifi6/docs/Heatit_WiFi6_OpenAPI_v70.yaml -p 4010 &
+          npx -y @stoplight/prism-cli mock custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml -p 4010 &
           sleep 5
 
       - name: Set up Home Assistant Config
         run: |
           mkdir -p ha_config/custom_components
-          cp -r custom_components/heatit_wifi6 ha_config/custom_components/
+          cp -r custom_components/heatit_wifi ha_config/custom_components/
           cat << 'CONF' > ha_config/configuration.yaml
           default_config:
           logger:
             default: info
             logs:
-              custom_components.heatit_wifi6: debug
+              custom_components.heatit_wifi: debug
 
           automation:
             - alias: "Test HVAC Mode on Startup"
@@ -63,7 +63,7 @@ jobs:
                   "entry_id": "e0b8a1c9d4f211ee9c270242ac120002",
                   "version": 1,
                   "minor_version": 1,
-                  "domain": "heatit_wifi6",
+                  "domain": "heatit_wifi",
                   "title": "Mocked Heatit Thermostat",
                   "data": {
                     "host": "http://127.0.0.1:4010",
