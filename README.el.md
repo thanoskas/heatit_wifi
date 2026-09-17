@@ -1,8 +1,16 @@
 # Heatit WiFi — Ενσωμάτωση για το Home Assistant
 
+<div align="center">
+  <a href="https://smarthomehellas.gr"><img src="https://github.com/thanoskas/heatit_wifi/raw/main/docs/images/smarthomehellas_logo.png" alt="Smart Home Hellas" width="240"></a>
+  <p><strong>Φτιαγμένο με περηφάνια από τη <a href="https://smarthomehellas.gr">Smart Home Hellas</a></strong></p>
+</div>
+
 Τοπική ενσωμάτωση (μόνο στο δίκτυό σας, χωρίς cloud) για τους θερμοστάτες **Heatit WiFi6** και **Heatit WiFi7** της Heatit (Thermo-Floor AS). Η ενσωμάτωση αναπτύσσεται και συντηρείται από τη [Smart Home Hellas](mailto:info@smarthomehellas.gr).
 
 Πλήρης τεκμηρίωση (λίστα οντοτήτων, ιστορικό εκδόσεων, ανάπτυξη): [README.md](README.md) στα αγγλικά.
+
+## Αποποίηση ευθύνης
+Ανεξάρτητη ενσωμάτωση τρίτου, χωρίς σχέση με τη Heatit. Χρήση με δική σας ευθύνη.
 
 ## Υποστηριζόμενες συσκευές
 | Συσκευή | Firmware | Εντοπισμός |
