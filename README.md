@@ -144,21 +144,6 @@ The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6
     * Added internal / external / floor temperature sensors, heating / cooling / eco setpoint diagnostic sensors, and a WiFi signal strength diagnostic sensor.
     * Added open-window-detected and open-window-detection-enabled binary sensors.
     * Aligned the integration with Home Assistant's developer guidelines: `entry.runtime_data`, shared entity base class, `quality_scale: bronze`, `configuration_url` and MAC connection on the device, translation-keyed entity names.
-* **1.2.2**
-    * Fixed climate entity and temperature missing due to async property getter.
-* **1.2.1**
-    * Fixed dual climate entity popping up
-* **1.2.0**
-    * Fixed climate entity grouping with sensors under a single device.
-* **1.1.2**
-    * Prepared for official PR.
-    * Synchronized domain and logic for better compatibility.
-* **1.1.1**
-    * Enhanced stability and logic improvements.
-* **0.9.4**
-    * Current temperature is now dynamically based on the **sensorMode** configured on the device (Floor, Internal, or External).
-* **0.9.3**
-    * Initial Release
 
 ## Credits
 * [mattik-gh](https://github.com/mattik-gh/heatit_wifi6) — original `heatit_wifi6` integration (versions 0.9.3 – 1.2.x) and the WiFi6 OpenAPI document.
