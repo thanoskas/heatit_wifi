@@ -81,6 +81,27 @@ async def test_size_of_load_in_watts(hass: HomeAssistant, config_entry, mock_api
     mock_api["set_parameter"].assert_awaited_once_with("sizeOfLoad", 0)
 
 
+async def test_power_regulator_active_time_in_percent(
+    hass: HomeAssistant, config_entry, mock_api
+) -> None:
+    """The PWER duty cycle is stored as 1-10 but exposed in 10 % steps."""
+    entity_id = "number.lab_thermostat_power_regulator_active_time"
+    state = hass.states.get(entity_id)
+    assert state.state == "20"
+    assert state.attributes["unit_of_measurement"] == "%"
+    assert state.attributes["min"] == 10
+    assert state.attributes["max"] == 100
+    assert state.attributes["step"] == 10
+
+    await _set_value(hass, entity_id, 50)
+    mock_api["set_parameter"].assert_awaited_once_with("powerRegulatorActiveTime", 5)
+    assert hass.states.get(entity_id).state == "50"
+
+    mock_api["set_parameter"].reset_mock()
+    await _set_value(hass, entity_id, 100)
+    mock_api["set_parameter"].assert_awaited_once_with("powerRegulatorActiveTime", 10)
+
+
 @pytest.mark.parametrize(
     ("value", "payload"),
     [(0, 0), (5, 0), (10, 10), (600.0, 600), (65535, 65535)],

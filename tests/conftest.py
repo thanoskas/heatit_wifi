@@ -49,7 +49,7 @@ WIFI6_STATUS: dict[str, Any] = {
         "internalCalibration": 0.0,
         "floorCalibration": -0.5,
         "externalCalibration": 0.0,
-        "powerRegulatorActiveTime": 20,
+        "powerRegulatorActiveTime": 2,
         "floorMinimumTemperatureLimit": 5.0,
         "floorMaximumTemperatureLimit": 27.0,
         "internalMinimumTemperatureLimit": 5.0,

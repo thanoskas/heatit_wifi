@@ -55,6 +55,13 @@ def _size_of_load(data: dict[str, Any]) -> float | None:
     return None if value is None else value * 100
 
 
+def _power_regulator_active_time(data: dict[str, Any]) -> float | None:
+    # The API stores the PWER duty cycle in 10 % steps (1 = 10 %, 3 min of
+    # the 30 min cycle; default 2 = 20 %).
+    value = (data.get("parameters") or {}).get("powerRegulatorActiveTime")
+    return None if value is None else value * 10
+
+
 def _action_after_error_payload(value: float) -> int:
     # Valid values are 0 (stay off) or 10-65535 seconds; round the
     # unusable 1-9 s range down to "off".
@@ -180,10 +187,11 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFiNumberEntityDescription, ...] = (
         native_unit_of_measurement=PERCENTAGE,
         native_min_value=10,
         native_max_value=100,
-        native_step=1,
+        native_step=10,
         mode=NumberMode.SLIDER,
         parameter="powerRegulatorActiveTime",
-        value_fn=_parameter_field("powerRegulatorActiveTime"),
+        value_fn=_power_regulator_active_time,
+        payload_fn=lambda value: int(round(value / 10)),
     ),
     # Floor limits protect e.g. wooden floors, so they are on by default;
     # the internal/external limits are opt-in.
