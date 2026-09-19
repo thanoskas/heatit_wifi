@@ -105,6 +105,9 @@ Unit tests use `pytest-homeassistant-custom-component` with a mocked device and 
 The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
 
 ## Version history
+* **Unreleased**
+    * Greek translation (config flow, options and all entity names/states).
+    * CI: Dependabot for GitHub Actions and a monthly test run against HA stable, beta and dev.
 * **2.0.0**
     * Integration renamed to **Heatit WiFi** (domain `heatit_wifi`) and moved to this repository, maintained by Smart Home Hellas. Existing `heatit_wifi6` users: see [Migrating](#migrating-from-the-heatit_wifi6-integration).
     * Includes everything from the unreleased 1.4.0 below (zeroconf discovery, reconfigure, WiFi7 support incl. Relay mode, full parameter coverage, unit tests).

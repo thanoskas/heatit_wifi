@@ -1,0 +1,250 @@
+{
+   "title": "Heatit WiFi",
+   "config": {
+      "error": {
+         "cannot_connect": "Αποτυχία σύνδεσης. Ελέγξτε τη διεύθυνση — πρέπει να περιέχει μόνο τη βασική διεύθυνση URL, π.χ. http://192.168.10.5",
+         "unknown": "Άγνωστο σφάλμα."
+      },
+      "abort": {
+         "already_configured": "Αυτή η συσκευή Heatit έχει ήδη ρυθμιστεί.",
+         "cannot_connect": "Η συσκευή που εντοπίστηκε δεν απάντησε στο τοπικό API της Heatit.",
+         "different_device": "Η διεύθυνση αντιστοιχεί σε διαφορετική συσκευή Heatit. Για αντικατάσταση του θερμοστάτη, αφαιρέστε και προσθέστε ξανά την ενσωμάτωση.",
+         "reconfigure_successful": "Η διεύθυνση της συσκευής ενημερώθηκε."
+      },
+      "flow_title": "Θερμοστάτης Heatit στο {host}",
+      "step": {
+         "user": {
+            "title": "Ρύθμιση Heatit WiFi",
+            "description": "Δώστε ένα σύντομο όνομα και τη βασική διεύθυνση URL του θερμοστάτη.",
+            "data": {
+               "name": "Όνομα",
+               "host": "Βασική διεύθυνση URL συσκευής (π.χ. http://192.168.10.5)"
+            }
+         },
+         "reconfigure": {
+            "title": "Επαναρύθμιση συσκευής Heatit",
+            "description": "Ενημερώστε τη διεύθυνση του θερμοστάτη, π.χ. μετά από αλλαγή της IP του.",
+            "data": {
+               "host": "Βασική διεύθυνση URL συσκευής (π.χ. http://192.168.10.5)"
+            }
+         },
+         "zeroconf_confirm": {
+            "title": "Βρέθηκε θερμοστάτης Heatit",
+            "description": "Βρέθηκε θερμοστάτης Heatit στο {host}. Δώστε ένα σύντομο όνομα για να τον προσθέσετε.",
+            "data": {
+               "name": "Όνομα"
+            }
+         }
+      }
+   },
+   "options": {
+      "error": {
+         "cannot_connect": "Αποτυχία σύνδεσης. Ελέγξτε τη διεύθυνση — πρέπει να περιέχει μόνο τη βασική διεύθυνση URL, π.χ. http://192.168.10.5",
+         "different_device": "Η διεύθυνση αντιστοιχεί σε διαφορετική συσκευή Heatit. Για αντικατάσταση του θερμοστάτη, αφαιρέστε και προσθέστε ξανά την ενσωμάτωση."
+      },
+      "step": {
+         "init": {
+            "title": "Επιλογές Heatit WiFi",
+            "data": {
+               "host": "Βασική διεύθυνση URL συσκευής (π.χ. http://192.168.10.5)",
+               "scan_interval": "Διάστημα ανανέωσης (δευτερόλεπτα)"
+            }
+         }
+      }
+   },
+   "entity": {
+      "button": {
+         "reset_energy_meter": {
+            "name": "Μηδενισμός μετρητή ενέργειας"
+         },
+         "reset_settings": {
+            "name": "Επαναφορά ρυθμίσεων στις προεπιλογές"
+         },
+         "factory_reset": {
+            "name": "Επαναφορά εργοστασιακών ρυθμίσεων"
+         }
+      },
+      "select": {
+         "sensor_mode": {
+            "name": "Λειτουργία αισθητήρα",
+            "state": {
+               "floor": "Αισθητήρας δαπέδου (F)",
+               "internal": "Εσωτερικός αισθητήρας (A)",
+               "internal_floor_limit": "Εσωτερικός + όριο δαπέδου (AF)",
+               "external": "Εξωτερικός αισθητήρας (A2)",
+               "external_floor_limit": "Εξωτερικός + όριο δαπέδου (A2F)",
+               "power_regulator": "Ρυθμιστής ισχύος (PWER)",
+               "relay": "Ρελέ (RELA, μόνο WiFi7)"
+            }
+         },
+         "regulation_mode": {
+            "name": "Μέθοδος ρύθμισης",
+            "state": {
+               "hysteresis": "Υστέρηση (HYST)",
+               "pwm": "PWM"
+            }
+         },
+         "sensor_value": {
+            "name": "Τύπος αισθητήρα NTC",
+            "state": {
+               "6k8": "6.8 kΩ",
+               "10k": "10 kΩ",
+               "12k": "12 kΩ",
+               "15k": "15 kΩ",
+               "22k": "22 kΩ",
+               "33k": "33 kΩ",
+               "47k": "47 kΩ",
+               "100k": "100 kΩ"
+            }
+         },
+         "external_sensor_fallback": {
+            "name": "Εφεδρεία εξωτερικού αισθητήρα",
+            "state": {
+               "off": "Απενεργοποίηση",
+               "floor": "Αισθητήρας δαπέδου (F)",
+               "internal": "Εσωτερικός αισθητήρας (A)",
+               "internal_floor_limit": "Εσωτερικός + όριο δαπέδου (AF)",
+               "external": "Εξωτερικός αισθητήρας (A2)",
+               "external_floor_limit": "Εξωτερικός + όριο δαπέδου (A2F)",
+               "power_regulator": "Ρυθμιστής ισχύος (PWER)"
+            }
+         },
+         "device_restore_state": {
+            "name": "Κατάσταση ρελέ μετά από διακοπή ρεύματος",
+            "state": {
+               "previous": "Επαναφορά προηγούμενης κατάστασης",
+               "on": "Ενεργό",
+               "off": "Ανενεργό"
+            }
+         }
+      },
+      "number": {
+         "hysteresis": {
+            "name": "Υστέρηση"
+         },
+         "active_display_brightness": {
+            "name": "Φωτεινότητα οθόνης (ενεργή)"
+         },
+         "standby_display_brightness": {
+            "name": "Φωτεινότητα οθόνης (αναμονή)"
+         },
+         "internal_calibration": {
+            "name": "Βαθμονόμηση εσωτερικού αισθητήρα"
+         },
+         "floor_calibration": {
+            "name": "Βαθμονόμηση αισθητήρα δαπέδου"
+         },
+         "external_calibration": {
+            "name": "Βαθμονόμηση εξωτερικού αισθητήρα"
+         },
+         "power_regulator_active_time": {
+            "name": "Χρόνος λειτουργίας ρυθμιστή ισχύος"
+         },
+         "floor_min_temperature": {
+            "name": "Ελάχιστη θερμοκρασία δαπέδου"
+         },
+         "floor_max_temperature": {
+            "name": "Μέγιστη θερμοκρασία δαπέδου"
+         },
+         "internal_min_temperature": {
+            "name": "Ελάχιστη εσωτερική θερμοκρασία"
+         },
+         "internal_max_temperature": {
+            "name": "Μέγιστη εσωτερική θερμοκρασία"
+         },
+         "external_min_temperature": {
+            "name": "Ελάχιστη εξωτερική θερμοκρασία"
+         },
+         "external_max_temperature": {
+            "name": "Μέγιστη εξωτερική θερμοκρασία"
+         },
+         "size_of_load": {
+            "name": "Μέγεθος φορτίου"
+         },
+         "action_after_error": {
+            "name": "Καθυστέρηση επανάληψης μετά από σφάλμα"
+         },
+         "automatic_turn_off": {
+            "name": "Αυτόματη απενεργοποίηση"
+         },
+         "automatic_turn_on": {
+            "name": "Αυτόματη ενεργοποίηση"
+         },
+         "turn_off_delay": {
+            "name": "Καθυστέρηση απενεργοποίησης"
+         }
+      },
+      "switch": {
+         "temperature_display": {
+            "name": "Εμφάνιση μετρούμενης θερμοκρασίας"
+         },
+         "child_lock": {
+            "name": "Κλείδωμα παιδιών"
+         },
+         "open_window_detection": {
+            "name": "Ανίχνευση ανοιχτού παραθύρου"
+         },
+         "relay": {
+            "name": "Ρελέ"
+         },
+         "always_on": {
+            "name": "Πάντα ενεργό"
+         },
+         "inverted_output": {
+            "name": "Αντεστραμμένη έξοδος"
+         }
+      },
+      "binary_sensor": {
+         "open_window_detected": {
+            "name": "Ανιχνεύθηκε ανοιχτό παράθυρο"
+         },
+         "open_window_detection_enabled": {
+            "name": "Ανίχνευση ανοιχτού παραθύρου"
+         }
+      },
+      "sensor": {
+         "current_temperature": {
+            "name": "Τρέχουσα θερμοκρασία"
+         },
+         "target_temperature": {
+            "name": "Επιθυμητή θερμοκρασία"
+         },
+         "power": {
+            "name": "Ισχύς"
+         },
+         "energy": {
+            "name": "Ενέργεια"
+         },
+         "internal_temperature": {
+            "name": "Εσωτερική θερμοκρασία"
+         },
+         "external_temperature": {
+            "name": "Εξωτερική θερμοκρασία"
+         },
+         "floor_temperature": {
+            "name": "Θερμοκρασία δαπέδου"
+         },
+         "heating_setpoint": {
+            "name": "Στόχος θέρμανσης"
+         },
+         "cooling_setpoint": {
+            "name": "Στόχος ψύξης"
+         },
+         "eco_setpoint": {
+            "name": "Στόχος Eco"
+         },
+         "open_window_remaining_time": {
+            "name": "Υπόλοιπος χρόνος ανοιχτού παραθύρου"
+         },
+         "wifi_signal_strength": {
+            "name": "Ισχύς σήματος WiFi"
+         },
+         "wifi_signal_quality": {
+            "name": "Ποιότητα σήματος WiFi"
+         },
+         "ip_address": {
+            "name": "Διεύθυνση IP"
+         }
+      }
+   }
+}
