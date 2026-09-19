@@ -5,10 +5,23 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # Monthly compatibility sweep against beta / dev to catch upstream HA breakage
+  # before it lands in stable. Runs on the 1st of every month at 06:00 UTC.
+  schedule:
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
 
 jobs:
   test:
+    name: test (HA ${{ matrix.ha_version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # PRs and pushes to main test against `stable` only. Scheduled runs
+        # and manual dispatches also test `beta` and `dev` to surface
+        # upcoming HA breakage.
+        ha_version: ${{ fromJSON((github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '["stable","beta","dev"]' || '["stable"]') }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -103,9 +116,9 @@ jobs:
             --name homeassistant \
             --network host \
             -v $(pwd)/ha_config:/config \
-            ghcr.io/home-assistant/home-assistant:stable
+            ghcr.io/home-assistant/home-assistant:${{ matrix.ha_version }}
 
-          echo "Waiting for Home Assistant to start..."
+          echo "Waiting for Home Assistant to start (HA ${{ matrix.ha_version }})..."
           # Wait up to 60s for HA to be responsive
           for i in {1..12}; do
             if curl -s http://localhost:8123/api/ > /dev/null; then
@@ -125,3 +138,11 @@ jobs:
 
       - name: Run Integration Tests
         run: python3 tests/test_integration.py
+
+      - name: Dump Home Assistant logs on failure
+        if: failure()
+        run: |
+          echo "----- docker logs homeassistant -----"
+          docker logs homeassistant || true
+          echo "----- ha_config/home-assistant.log -----"
+          cat ha_config/home-assistant.log 2>/dev/null || echo "(no log file)"
