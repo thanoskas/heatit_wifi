@@ -168,3 +168,21 @@ The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6
 
 ## License
 [MIT](LICENSE.md).
+
+---
+
+<div align="center">
+<strong>⭐ If this integration helps you automate your home, please star the repository!</strong>
+</div>
+
+<div align="center">
+<strong>☕ Support Development</strong><br>
+If you find this project helpful:<br><br>
+<a href="https://paypal.me/thanoskasolas"><img src="https://img.shields.io/badge/PayPal-Donate-blue.svg?style=for-the-badge" alt="PayPal Donate"></a>
+</div>
+
+---
+
+<div align="center">
+<sub>Made with ❤️ by <a href="https://smarthomehellas.gr">Smart Home Hellas</a></sub>
+</div>

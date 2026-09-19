@@ -83,3 +83,21 @@ Smart Home Hellas — [info@smarthomehellas.gr](mailto:info@smarthomehellas.gr)
 
 ## Άδεια χρήσης
 [MIT](LICENSE.md). Βασισμένο στην αρχική ενσωμάτωση `heatit_wifi6` του [mattik-gh](https://github.com/mattik-gh/heatit_wifi6).
+
+---
+
+<div align="center">
+<strong>⭐ Αν η ενσωμάτωση σας βοηθά να αυτοματοποιήσετε το σπίτι σας, δώστε ένα αστέρι στο repository!</strong>
+</div>
+
+<div align="center">
+<strong>☕ Υποστηρίξτε την ανάπτυξη</strong><br>
+Αν σας φάνηκε χρήσιμο το project:<br><br>
+<a href="https://paypal.me/thanoskasolas"><img src="https://img.shields.io/badge/PayPal-Donate-blue.svg?style=for-the-badge" alt="PayPal Donate"></a>
+</div>
+
+---
+
+<div align="center">
+<sub>Φτιαγμένο με ❤️ από τη <a href="https://smarthomehellas.gr">Smart Home Hellas</a></sub>
+</div>
