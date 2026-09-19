@@ -105,6 +105,9 @@ Unit tests use `pytest-homeassistant-custom-component` with a mocked device and 
 The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
 
 ## Version history
+* **2.0.3**
+    * Fix: the Heatit icon and logo now show in Home Assistant (Settings → Devices & services, the setup dialog and the device page; HA 2026.3 or newer). The images were in a `brands/` folder, which Home Assistant does not read; they are now in `brand/`. The HACS store still shows a placeholder until HACS supports icons shipped inside the integration.
+    * Version history: the entries for the original `heatit_wifi6` releases (0.9.3 – 1.2.x) were removed; see the Credits section.
 * **2.0.2**
     * Fix: *Power regulator active time* now uses the thermostat's real scale. The device stores 1–10 (×10 %), but the entity treated the raw value as 10–100 %, so the default 20 % showed as "2 %" and writes sent out-of-range values. It now shows 10–100 % in 10 % steps. If you changed this setting with an earlier version, set it again.
 * **2.0.1**
