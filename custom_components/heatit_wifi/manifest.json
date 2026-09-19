@@ -10,6 +10,6 @@
   "issue_tracker": "https://github.com/thanoskas/heatit_wifi/issues",
   "quality_scale": "bronze",
   "requirements": [],
-  "version": "2.0.0",
+  "version": "2.0.1",
   "zeroconf": [{"type": "_tf._tcp.local."}]
 }
