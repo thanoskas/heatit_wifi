@@ -105,7 +105,7 @@ Unit tests use `pytest-homeassistant-custom-component` with a mocked device and 
 The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
 
 ## Version history
-* **Unreleased**
+* **2.0.2**
     * Fix: *Power regulator active time* now uses the thermostat's real scale. The device stores 1–10 (×10 %), but the entity treated the raw value as 10–100 %, so the default 20 % showed as "2 %" and writes sent out-of-range values. It now shows 10–100 % in 10 % steps. If you changed this setting with an earlier version, set it again.
 * **2.0.1**
     * Greek translation: the setup, options and reconfigure screens plus every entity name and select option appear in Greek when the HA profile language is Ελληνικά. Entity IDs do not change.
