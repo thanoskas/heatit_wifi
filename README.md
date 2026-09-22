@@ -105,7 +105,7 @@ Unit tests use `pytest-homeassistant-custom-component` with a mocked device and 
 The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
 
 ## Version history
-* **Unreleased**
+* **2.0.4**
     * Fix: on a WiFi7, *Active/Standby display brightness* kept the 0–100 slider only while the value was above 10. After dimming to 10 or less the slider switched to the WiFi6's 1–10 scale and the brightness could no longer be raised from Home Assistant. The scale now follows the thermostat model ([#3](https://github.com/thanoskas/heatit_wifi/issues/3)).
 * **2.0.3**
     * Fix: the Heatit icon and logo now show in Home Assistant (Settings → Devices & services, the setup dialog and the device page; HA 2026.3 or newer). The images were in a `brands/` folder, which Home Assistant does not read; they are now in `brand/`. The HACS store still shows a placeholder until HACS supports icons shipped inside the integration.
