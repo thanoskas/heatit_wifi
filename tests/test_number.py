@@ -142,6 +142,38 @@ async def test_wifi7_thermostat_mode(hass: HomeAssistant, config_entry, mock_api
     mock_api["set_parameter"].assert_awaited_once_with("floorSensorCalibration", 1.2)
 
 
+async def test_wifi6_brightness_scale(hass: HomeAssistant, config_entry, mock_api) -> None:
+    """A WiFi6 keeps its 1-10 brightness scale."""
+    state = hass.states.get("number.lab_thermostat_standby_display_brightness")
+    assert state.state == "3"
+    assert state.attributes["min"] == 1
+    assert state.attributes["max"] == 10
+    assert state.attributes["step"] == 1
+
+
+def _wifi7_dimmed_status() -> dict:
+    status = copy.deepcopy(WIFI7_STATUS)
+    status["parameters"]["standbyDisplayBrightness"] = 10
+    return status
+
+
+@pytest.mark.parametrize("status", [_wifi7_dimmed_status()])
+async def test_wifi7_brightness_scale_when_dimmed(
+    hass: HomeAssistant, config_entry, mock_api
+) -> None:
+    """A WiFi7 dimmed to 10 keeps the 0-100 slider and can be raised again."""
+    entity_id = "number.lab_thermostat_standby_display_brightness"
+    state = hass.states.get(entity_id)
+    assert state.state == "10"
+    assert state.attributes["min"] == 0
+    assert state.attributes["max"] == 100
+    assert state.attributes["step"] == 10
+
+    await _set_value(hass, entity_id, 50)
+    mock_api["set_parameter"].assert_awaited_once_with("standbyDisplayBrightness", 50)
+    assert hass.states.get(entity_id).state == "50"
+
+
 @pytest.mark.parametrize("status", [copy.deepcopy(WIFI7_RELAY_STATUS)])
 async def test_wifi7_relay_mode(hass: HomeAssistant, config_entry, mock_api) -> None:
     """In Relay mode the timers work and the thermostat numbers go unavailable."""

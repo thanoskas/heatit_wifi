@@ -144,7 +144,7 @@ BRIGHTNESS_KEYS = {"active_display_brightness", "standby_display_brightness"}
 
 def _brightness(key: str, parameter: str) -> HeatitWiFiNumberEntityDescription:
     # WiFi6 uses a 1-10 scale (x10%); WiFi7 firmware reports 0-100 in
-    # steps of 10. The entity switches scale based on the reported value.
+    # steps of 10. The entity switches scale based on the reported model.
     return HeatitWiFiNumberEntityDescription(
         key=key,
         translation_key=key,
@@ -298,9 +298,16 @@ class HeatitWiFiNumber(HeatitWiFiEntity, NumberEntity):
         return self.entity_description.value_fn(data)
 
     def _percent_scale(self) -> bool:
-        """True when this is a brightness on the WiFi7's 0-100 scale."""
+        """True when this is a brightness on the WiFi7's 0-100 scale.
+
+        Decided by the model, not the value: a WiFi7 dimmed to 10 or less
+        would otherwise drop to the WiFi6's 1-10 slider and could no longer
+        be raised above 10 from Home Assistant.
+        """
         if self.entity_description.key not in BRIGHTNESS_KEYS:
             return False
+        if (self.coordinator.data or {}).get("model"):
+            return True
         value = self.native_value
         return value is not None and value > 10
 
