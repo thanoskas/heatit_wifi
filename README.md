@@ -105,7 +105,7 @@ Unit tests use `pytest-homeassistant-custom-component` with a mocked device and 
 The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
 
 ## Version history
-* **Unreleased**
+* **2.1.1**
     * The bundled brand images now include the hDPI versions, so the Heatit icon and logo stay sharp on high resolution screens. The HACS store still shows a placeholder: it reads the Home Assistant brands CDN, which no longer accepts images for custom integrations ([hacs/integration#5171](https://github.com/hacs/integration/issues/5171)).
 * **2.1.0**
     * Fix: *Display measured temperature* did nothing on a WiFi7. Firmware 0.1.13 renamed `temperatureDisplay` to `displayInformation` and answers `Success` to the old name without acting on it, so the switch was stuck and every write was lost. It now reads and writes whichever name the thermostat reports.
