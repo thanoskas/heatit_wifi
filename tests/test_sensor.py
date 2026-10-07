@@ -44,10 +44,26 @@ async def test_owd_remaining_time_counting(hass: HomeAssistant, config_entry) ->
     assert hass.states.get("sensor.lab_thermostat_open_window_remaining_time").state == "900"
 
 
+def _relay_without_owd() -> dict:
+    status = copy.deepcopy(WIFI7_RELAY_STATUS)
+    status["parameters"].pop("OWD")
+    return status
+
+
 @pytest.mark.parametrize("status", [copy.deepcopy(WIFI7_RELAY_STATUS)])
-async def test_owd_remaining_time_missing_in_relay_mode(
+async def test_owd_remaining_time_in_relay_mode(
     hass: HomeAssistant, config_entry
 ) -> None:
+    """Firmware 0.1.13 keeps OWD in Relay mode, idle at 0 s."""
+    assert (
+        hass.states.get("sensor.lab_thermostat_open_window_remaining_time").state
+        == "0"
+    )
+
+
+@pytest.mark.parametrize("status", [_relay_without_owd()])
+async def test_owd_remaining_time_missing(hass: HomeAssistant, config_entry) -> None:
+    """A payload without OWD must read unknown, not crash the platform."""
     assert (
         hass.states.get("sensor.lab_thermostat_open_window_remaining_time").state
         == STATE_UNKNOWN
