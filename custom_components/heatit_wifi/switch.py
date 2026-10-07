@@ -29,6 +29,11 @@ class HeatitWiFiSwitchEntityDescription(SwitchEntityDescription):
     # The WiFi7 firmware validates parameter types strictly (e.g.
     # disableButtons must be an integer, not a boolean).
     payload_fn: Callable[[bool], Any] = bool
+    # The WiFi7 renamed some parameters (temperatureDisplay ->
+    # displayInformation); when set, reads accept either name and writes
+    # use whichever the device actually reports. The old name is still
+    # acknowledged by WiFi7 firmware 0.1.13 but silently ignored.
+    alt_parameter: str | None = None
     # Applies the freshly written value to the cached status payload so
     # the UI updates immediately instead of waiting for the next poll.
     set_local: Callable[[dict[str, Any], Any], None] | None = None
@@ -39,6 +44,19 @@ class HeatitWiFiSwitchEntityDescription(SwitchEntityDescription):
 def _parameter_field(name: str) -> Callable[[dict[str, Any]], bool | None]:
     def _value(data: dict[str, Any]) -> bool | None:
         value = (data.get("parameters") or {}).get(name)
+        return None if value is None else bool(value)
+
+    return _value
+
+
+def _dual_parameter_field(
+    primary: str, alt: str
+) -> Callable[[dict[str, Any]], bool | None]:
+    def _value(data: dict[str, Any]) -> bool | None:
+        params = data.get("parameters") or {}
+        value = params.get(primary)
+        if value is None:
+            value = params.get(alt)
         return None if value is None else bool(value)
 
     return _value
@@ -64,7 +82,13 @@ SWITCH_DESCRIPTIONS: tuple[HeatitWiFiSwitchEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         device_class=SwitchDeviceClass.SWITCH,
         parameter="temperatureDisplay",
-        value_fn=_parameter_field("temperatureDisplay"),
+        alt_parameter="displayInformation",
+        value_fn=_dual_parameter_field(
+            "temperatureDisplay", "displayInformation"
+        ),
+        # 0/1 is valid for both names; the WiFi7 rejects a real boolean
+        # with HTTP 422.
+        payload_fn=int,
     ),
     HeatitWiFiSwitchEntityDescription(
         key="child_lock",
@@ -184,12 +208,22 @@ class HeatitWiFiSwitch(HeatitWiFiEntity, SwitchEntity):
         """Disable the parameter on the device."""
         await self._async_set(False)
 
+    def _api_parameter(self) -> str:
+        """Return the parameter name this device actually uses."""
+        description = self.entity_description
+        if description.alt_parameter:
+            params = (self.coordinator.data or {}).get("parameters") or {}
+            if description.parameter not in params and description.alt_parameter in params:
+                return description.alt_parameter
+        return description.parameter
+
     async def _async_set(self, value: bool) -> None:
         description = self.entity_description
+        parameter = self._api_parameter()
         payload = description.payload_fn(value)
-        if not await self._api.set_parameter(description.parameter, payload):
+        if not await self._api.set_parameter(parameter, payload):
             raise HomeAssistantError(
-                f"Failed to set {description.parameter} to {payload}"
+                f"Failed to set {parameter} to {payload}"
                 " on the Heatit thermostat"
             )
         # Push the new value into the shared cache and notify every
@@ -200,7 +234,7 @@ class HeatitWiFiSwitch(HeatitWiFiEntity, SwitchEntity):
             if description.set_local is not None:
                 description.set_local(data, payload)
             else:
-                data.setdefault("parameters", {})[description.parameter] = payload
+                data.setdefault("parameters", {})[parameter] = payload
             self.coordinator.async_set_updated_data(data)
         else:
             await self.coordinator.async_request_refresh()
@@ -237,10 +271,10 @@ class HeatitWiFiRelaySwitch(HeatitWiFiEntity, SwitchEntity):
         data = self.coordinator.data or {}
         # Prefer the live relay state; fall back to the onOff parameter.
         # The spec documents "Open"/"Closed" but real firmware (0.1.13)
-        # sends lowercase, so compare case-insensitively.
+        # sends lowercase "open"/"close", so accept every spelling.
         state = str(data.get("state", "")).lower()
-        if state in ("open", "closed"):
-            return state == "closed"
+        if state in ("open", "close", "closed"):
+            return state != "open"
         value = (data.get("parameters") or {}).get("onOff")
         return None if value is None else bool(value)
 
@@ -259,7 +293,7 @@ class HeatitWiFiRelaySwitch(HeatitWiFiEntity, SwitchEntity):
             )
         if data := self.coordinator.data:
             data.setdefault("parameters", {})["onOff"] = value
-            data["state"] = "closed" if value else "open"
+            data["state"] = "close" if value else "open"
             self.coordinator.async_set_updated_data(data)
         else:
             await self.coordinator.async_request_refresh()

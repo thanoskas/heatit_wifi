@@ -11,7 +11,7 @@
          "different_device": "The address points to a different Heatit device. To replace the thermostat, remove and re-add the integration.",
          "reconfigure_successful": "The device address was updated."
       },
-      "flow_title": "Heatit thermostat at {host}",
+      "flow_title": "Thermostat at {host}",
       "step": {
          "user": {
             "title": "Configure Heatit WiFi",
@@ -244,6 +244,15 @@
          },
          "ip_address": {
             "name": "IP address"
+         },
+         "ssid": {
+            "name": "Wi-Fi network"
+         },
+         "directlink_links": {
+            "name": "DirectLinks"
+         },
+         "bluefusion_links": {
+            "name": "BlueFusion links"
          }
       }
    }

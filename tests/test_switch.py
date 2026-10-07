@@ -38,6 +38,32 @@ async def test_wifi6_has_no_relay_entities(hass: HomeAssistant, config_entry) ->
     )
 
 
+async def test_display_switch_wifi6_parameter(
+    hass: HomeAssistant, config_entry, mock_api
+) -> None:
+    """The WiFi6 name takes 0/1 as well as a boolean."""
+    entity_id = "switch.lab_thermostat_display_measured_temperature"
+    await _turn(hass, entity_id, False)
+    mock_api["set_parameter"].assert_awaited_once_with("temperatureDisplay", 0)
+    assert hass.states.get(entity_id).state == STATE_OFF
+
+
+@pytest.mark.parametrize("status", [copy.deepcopy(WIFI7_STATUS)])
+async def test_display_switch_wifi7_parameter(
+    hass: HomeAssistant, config_entry, mock_api
+) -> None:
+    """Firmware 0.1.13 only honours displayInformation.
+
+    It acknowledges a write to temperatureDisplay with "Success" and then
+    ignores it, so the switch has to use the new name.
+    """
+    entity_id = "switch.lab_thermostat_display_measured_temperature"
+    assert hass.states.get(entity_id).state == STATE_ON
+    await _turn(hass, entity_id, False)
+    mock_api["set_parameter"].assert_awaited_once_with("displayInformation", 0)
+    assert hass.states.get(entity_id).state == STATE_OFF
+
+
 async def test_child_lock_sends_int(hass: HomeAssistant, config_entry, mock_api) -> None:
     """WiFi7 firmware rejects a boolean for disableButtons."""
     assert hass.states.get("switch.lab_thermostat_child_lock").state == STATE_OFF
@@ -71,14 +97,15 @@ async def test_wifi7_thermostat_mode_relay_extras_unavailable(
 
 @pytest.mark.parametrize("status", [copy.deepcopy(WIFI7_RELAY_STATUS)])
 async def test_wifi7_relay_mode_switches(hass: HomeAssistant, config_entry, mock_api) -> None:
-    # Thermostat-only settings vanish from the status in Relay mode.
+    # Firmware 0.1.13 keeps reporting the display and OWD settings in
+    # Relay mode, so those switches stay usable there.
     assert (
         hass.states.get("switch.lab_thermostat_display_measured_temperature").state
-        == STATE_UNAVAILABLE
+        == STATE_OFF
     )
     assert (
         hass.states.get("switch.lab_thermostat_open_window_detection").state
-        == STATE_UNAVAILABLE
+        == STATE_OFF
     )
 
     # Live relay state comes from the lowercase "state" field.

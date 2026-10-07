@@ -72,14 +72,23 @@ def _wifi7_status() -> dict[str, Any]:
     """A WiFi7 (firmware 0.1.13) in Internal sensor mode.
 
     Compared with the WiFi6 it adds the model field, renames the calibration
-    parameters, reports the RSSI at the top level, uses a 0-100 brightness
-    scale, numbers sensorValue differently and has externalSensorFallback.
+    parameters and temperatureDisplay, reports the RSSI at the top level,
+    uses a 0-100 brightness scale, numbers sensorValue differently, has
+    externalSensorFallback and reports DirectLink/BlueFusion links.
     """
     status = copy.deepcopy(WIFI6_STATUS)
     status["model"] = "Heatit WiFi7"
     status["firmware"] = "0.1.13"
     status["wifiSignalStrength"] = "-45dBm"
-    status["network"] = {"mac": "8e:6e:dc:28:a7:d0", "ipAddress": "192.168.1.51"}
+    status["network"] = {
+        "mac": "8e:6e:dc:28:a7:d0",
+        "ipAddress": "192.168.1.51",
+        "SSID": "Lab WiFi",
+    }
+    status["name"] = "THERMOSTAT_d45568"  # never renamed in the app
+    status["room"] = "Lab"
+    status["directLink"] = {"relayControl": [], "masterThermostat": []}
+    status["blueFusion"] = {"link": []}
     params = status["parameters"]
     for old, new in (
         ("internalCalibration", "internalSensorCalibration"),
@@ -87,6 +96,9 @@ def _wifi7_status() -> dict[str, Any]:
         ("externalCalibration", "externalSensorCalibration"),
     ):
         params[new] = params.pop(old)
+    # temperatureDisplay is gone; the WiFi7 calls it displayInformation
+    # and takes an integer (a boolean is rejected with HTTP 422).
+    params["displayInformation"] = int(params.pop("temperatureDisplay"))
     params["sensorValue"] = 1  # 10 kOhm in the WiFi7 numbering
     params["externalSensorFallback"] = 2
     params["activeDisplayBrightness"] = 70
@@ -97,17 +109,26 @@ def _wifi7_status() -> dict[str, Any]:
 
 WIFI7_STATUS: dict[str, Any] = _wifi7_status()
 
-# The same WiFi7 switched to Relay mode (RELA): the thermostat-only
-# parameters disappear from the status and the relay ones show up.
+# The same WiFi7 switched to Relay mode (RELA): the regulation parameters
+# (setpoints, hysteresis, limits, sensorValue) disappear from the status
+# and the relay ones show up. Display, calibration and OWD stay, as the
+# live LAB unit on firmware 0.1.13 reports them in Relay mode too.
 WIFI7_RELAY_STATUS: dict[str, Any] = {
     "id": DEVICE_ID,
     "model": "Heatit WiFi7",
     "firmware": "0.1.13",
-    "state": "closed",
+    # Firmware 0.1.13 says "close", not the spec's "Closed".
+    "state": "close",
     "currentPower": 0,
     "totalConsumption": 3.0,
     "wifiSignalStrength": "-70dBm",
-    "network": {"mac": "8e:6e:dc:28:a7:d0", "ipAddress": "192.168.1.51"},
+    "network": {
+        "mac": "8e:6e:dc:28:a7:d0",
+        "ipAddress": "192.168.1.51",
+        "SSID": "Lab WiFi",
+    },
+    "directLink": {"relayControl": [], "masterThermostat": []},
+    "blueFusion": {"link": []},
     "parameters": {
         "sensorMode": 7,
         "onOff": True,
@@ -119,6 +140,14 @@ WIFI7_RELAY_STATUS: dict[str, Any] = {
         "deviceRestoreState": 0,
         "sizeOfLoad": 0,
         "disableButtons": 1,
+        "actionAfterError": 0,
+        "activeDisplayBrightness": 100,
+        "standbyDisplayBrightness": 50,
+        "displayInformation": 0,
+        "internalSensorCalibration": 0.0,
+        "floorSensorCalibration": 0.0,
+        "externalSensorCalibration": 0.0,
+        "OWD": {"openWindowDetection": False, "activeNow": False, "activeTime": 0},
     },
 }
 

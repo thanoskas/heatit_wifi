@@ -76,3 +76,46 @@ async def test_unavailable_when_device_unreachable(
 
 async def test_ip_address(hass: HomeAssistant, config_entry) -> None:
     assert hass.states.get("sensor.lab_thermostat_ip_address").state == "192.168.1.50"
+
+
+async def test_wifi6_reports_no_ssid_or_links(
+    hass: HomeAssistant, config_entry
+) -> None:
+    """API v7 has no SSID in the status and no DirectLink/BlueFusion."""
+    for entity_id in (
+        "sensor.lab_thermostat_wi_fi_network",
+        "sensor.lab_thermostat_directlinks",
+        "sensor.lab_thermostat_bluefusion_links",
+    ):
+        assert hass.states.get(entity_id).state == STATE_UNKNOWN, entity_id
+
+
+@pytest.mark.parametrize("status", [copy.deepcopy(WIFI7_STATUS)])
+async def test_wifi7_ssid_and_empty_links(
+    hass: HomeAssistant, config_entry
+) -> None:
+    assert hass.states.get("sensor.lab_thermostat_wi_fi_network").state == "Lab WiFi"
+    assert hass.states.get("sensor.lab_thermostat_directlinks").state == "0"
+    assert hass.states.get("sensor.lab_thermostat_bluefusion_links").state == "0"
+
+
+def _with_links() -> dict:
+    status = copy.deepcopy(WIFI7_STATUS)
+    status["directLink"] = {
+        "relayControl": ["relay-1"],
+        "masterThermostat": ["slave-1", "slave-2"],
+    }
+    status["blueFusion"] = {"link": ["ble-1"]}
+    return status
+
+
+@pytest.mark.parametrize("status", [_with_links()])
+async def test_link_sensors_count_every_list(
+    hass: HomeAssistant, config_entry
+) -> None:
+    """The state counts the links; the attributes name them."""
+    state = hass.states.get("sensor.lab_thermostat_directlinks")
+    assert state.state == "3"
+    assert state.attributes["relay_control"] == ["relay-1"]
+    assert state.attributes["master_thermostat"] == ["slave-1", "slave-2"]
+    assert hass.states.get("sensor.lab_thermostat_bluefusion_links").state == "1"

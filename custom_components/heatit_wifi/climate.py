@@ -243,7 +243,7 @@ class HeatitWiFiThermostat(HeatitWiFiEntity, ClimateEntity):
             return HVACAction.HEATING
         if normalized == "cooling":
             return HVACAction.COOLING
-        if normalized in ("open", "closed"):
+        if normalized in ("open", "close", "closed"):
             # WiFi7 Relay mode; the climate entity is unavailable then.
             return None
         _LOGGER.error("Unknown state from Heatit: %s", state)

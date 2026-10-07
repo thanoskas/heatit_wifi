@@ -11,7 +11,7 @@
          "different_device": "Osoite viittaa eri Heatit-laitteeseen. Vaihda termostaatti poistamalla ja lisäämällä integraatio uudelleen.",
          "reconfigure_successful": "Laitteen osoite päivitettiin."
       },
-      "flow_title": "Heatit-termostaatti osoitteessa {host}",
+      "flow_title": "Termostaatti: {host}",
       "step": {
          "user": {
             "title": "Määritä Heatit WiFi",
@@ -244,6 +244,15 @@
          },
          "ip_address": {
             "name": "IP-osoite"
+         },
+         "ssid": {
+            "name": "Wi-Fi-verkko"
+         },
+         "directlink_links": {
+            "name": "DirectLink-linkit"
+         },
+         "bluefusion_links": {
+            "name": "BlueFusion-linkit"
          }
       }
    }

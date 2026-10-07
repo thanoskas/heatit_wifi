@@ -105,6 +105,12 @@ Unit tests use `pytest-homeassistant-custom-component` with a mocked device and 
 The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
 
 ## Version history
+* **Unreleased**
+    * Fix: *Display measured temperature* did nothing on a WiFi7. Firmware 0.1.13 renamed `temperatureDisplay` to `displayInformation` and answers `Success` to the old name without acting on it, so the switch was stuck and every write was lost. It now reads and writes whichever name the thermostat reports.
+    * Fix: a WiFi7 in Relay mode reports its contact as `close`, not the documented `Closed`, which left the relay switch reading the fallback parameter. Both spellings are accepted now.
+    * New: the room a thermostat is linked to in the MyHeatit app becomes its Home Assistant area when the device is added. A device you have already placed yourself is never moved.
+    * New: diagnostic sensors for the Wi-Fi network (SSID) and for the DirectLink and BlueFusion links, with the linked devices in the attributes. Disabled by default, like the other diagnostics.
+    * Discovery: the card shows the thermostat's own name as the suggested name (a WiFi7 nobody renamed in the app reports `THERMOSTAT_<MAC>`), and its address as a bare IP, which no longer gets cut off by the card.
 * **2.0.4**
     * Fix: on a WiFi7, *Active/Standby display brightness* kept the 0–100 slider only while the value was above 10. After dimming to 10 or less the slider switched to the WiFi6's 1–10 scale and the brightness could no longer be raised from Home Assistant. The scale now follows the thermostat model ([#3](https://github.com/thanoskas/heatit_wifi/issues/3)).
 * **2.0.3**

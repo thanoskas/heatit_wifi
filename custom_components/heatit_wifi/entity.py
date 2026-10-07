@@ -55,4 +55,11 @@ class HeatitWiFiEntity(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]]])
             info["connections"] = {(CONNECTION_NETWORK_MAC, mac)}
         if ip_address := network.get("ipAddress"):
             info["configuration_url"] = f"http://{ip_address}"
+        # The room the thermostat is linked to in the MyHeatit app becomes
+        # the Home Assistant area. Reading DeviceEntry.suggested_area is
+        # gone in Core 2026.9, but setting it here still picks the area a
+        # newly created device lands in, and a device the user has already
+        # moved stays where they put it.
+        if room := str(data.get("room") or "").strip():
+            info["suggested_area"] = room
         return info

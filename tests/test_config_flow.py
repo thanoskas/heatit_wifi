@@ -13,6 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
+from custom_components.heatit_wifi.config_flow import _device_label
 from custom_components.heatit_wifi.const import DOMAIN
 
 from .conftest import DEVICE_ID, DEVICE_NAME
@@ -33,11 +34,19 @@ def _discovery_info(ip: str = "192.168.1.17") -> ZeroconfServiceInfo:
     )
 
 
-def _patch_device_id(value: str):
-    """Control what the flow's connectivity probe returns."""
-    return patch(
-        "custom_components.heatit_wifi.config_flow.HeatitWiFiAPI.get_device_id",
-        new=AsyncMock(return_value=value),
+def _patch_device_id(value: str, app_name: str | None = None):
+    """Control what the flow's connectivity probe returns.
+
+    The manual path asks for the id alone; discovery reads the whole
+    status, which also carries the name the device got in the MyHeatit app.
+    """
+    status: dict[str, str] = {} if value == "unknown" else {"id": value}
+    if app_name is not None:
+        status["name"] = app_name
+    return patch.multiple(
+        "custom_components.heatit_wifi.config_flow.HeatitWiFiAPI",
+        get_device_id=AsyncMock(return_value=value),
+        get_status=AsyncMock(return_value=status),
     )
 
 
@@ -213,6 +222,43 @@ async def test_zeroconf_discovers_new_device(
         CONF_HOST: "http://192.168.1.17",
     }
     assert result["result"].unique_id == DEVICE_ID
+
+
+async def test_zeroconf_suggests_the_app_name(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
+    """The name box opens prefilled with the name set in the MyHeatit app."""
+    with _patch_device_id(DEVICE_ID, app_name="Thermostat hall"):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_ZEROCONF},
+            data=_discovery_info(),
+        )
+    assert result["step_id"] == "zeroconf_confirm"
+    marker = next(iter(result["data_schema"].schema))
+    assert marker.description == {"suggested_value": "Thermostat hall"}
+    # The discovery card shows the bare IP, not the http:// URL, so the
+    # address is not cut off by the card's title truncation.
+    flow = hass.config_entries.flow.async_progress()[0]
+    assert flow["context"]["title_placeholders"] == {"host": "192.168.1.17"}
+
+
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [
+        ({"name": "Hall", "room": "hall"}, "Hall"),
+        ({"name": "", "room": "Bathroom"}, "Bathroom"),
+        ({"name": "  Kitchen  "}, "Kitchen"),
+        # A WiFi7 nobody renamed yet keeps its factory name; the room goes
+        # to the Home Assistant area instead, not to the name.
+        ({"name": "THERMOSTAT_d45568", "room": "Lab"}, "THERMOSTAT_d45568"),
+        ({"room": "Lab"}, "Lab"),
+        ({}, ""),
+    ],
+)
+def test_device_label_prefers_the_app_name(status: dict, expected: str) -> None:
+    """Firmware without the field must leave the box empty, not crash."""
+    assert _device_label(status) == expected
 
 
 async def test_zeroconf_updates_host_of_known_device(

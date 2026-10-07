@@ -34,6 +34,7 @@ class HeatitWiFiSensorEntityDescription(SensorEntityDescription):
     """Describe a Heatit WiFi sensor."""
 
     value_fn: Callable[[dict[str, Any]], Any]
+    attributes_fn: Callable[[dict[str, Any]], dict[str, Any] | None] | None = None
 
 
 def _param(name: str) -> Callable[[dict[str, Any]], Any]:
@@ -73,6 +74,36 @@ def _owd_remaining_time(data: dict[str, Any]) -> int | None:
     # (0 when not triggered). Read-only on the device.
     owd = (data.get("parameters") or {}).get("OWD") or {}
     return owd.get("activeTime")
+
+
+def _snake(key: str) -> str:
+    return "".join("_" + c.lower() if c.isupper() else c for c in key)
+
+
+def _link_lists(data: dict[str, Any], field: str) -> dict[str, list[Any]] | None:
+    """Return the link lists of directLink/blueFusion, keys snake_cased.
+
+    Undocumented in the WiFi6 API spec; firmware 0.1.13 reports
+    directLink: {relayControl: [], masterThermostat: []} and
+    blueFusion: {link: []}. Reading every list instead of the known keys
+    keeps new link types working without a code change.
+    """
+    links = data.get(field)
+    if not isinstance(links, dict):
+        return None
+    return {
+        _snake(key): value
+        for key, value in links.items()
+        if isinstance(value, list)
+    }
+
+
+def _link_count(field: str) -> Callable[[dict[str, Any]], int | None]:
+    def _value(data: dict[str, Any]) -> int | None:
+        lists = _link_lists(data, field)
+        return None if lists is None else sum(len(v) for v in lists.values())
+
+    return _value
 
 
 def _wifi_signal(data: dict[str, Any]) -> int | None:
@@ -223,6 +254,37 @@ SENSOR_DESCRIPTIONS: tuple[HeatitWiFiSensorEntityDescription, ...] = (
         icon="mdi:ip-network",
         value_fn=lambda data: (data.get("network") or {}).get("ipAddress"),
     ),
+    HeatitWiFiSensorEntityDescription(
+        key="ssid",
+        translation_key="ssid",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        icon="mdi:wifi-settings",
+        value_fn=lambda data: (data.get("network") or {}).get("SSID"),
+    ),
+    # Which devices this one drives (relay control, master thermostat,
+    # external wireless sensor, ...); the ids are in the attributes.
+    HeatitWiFiSensorEntityDescription(
+        key="directlink_links",
+        translation_key="directlink_links",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        icon="mdi:link-variant",
+        value_fn=_link_count("directLink"),
+        attributes_fn=lambda data: _link_lists(data, "directLink"),
+    ),
+    # Bluetooth-only devices bridged to Wi-Fi through this one.
+    HeatitWiFiSensorEntityDescription(
+        key="bluefusion_links",
+        translation_key="bluefusion_links",
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        icon="mdi:bluetooth-connect",
+        value_fn=_link_count("blueFusion"),
+        attributes_fn=lambda data: _link_lists(data, "blueFusion"),
+    ),
 )
 
 
@@ -263,3 +325,9 @@ class HeatitWiFiSensor(HeatitWiFiEntity, SensorEntity):
         if not data:
             return None
         return self.entity_description.value_fn(data)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        if (attributes_fn := self.entity_description.attributes_fn) is None:
+            return None
+        return attributes_fn(self.coordinator.data or {})

@@ -37,6 +37,20 @@ def _normalize_host(host: str) -> str:
     return host.rstrip("/")
 
 
+def _device_label(status: dict[str, Any]) -> str:
+    """Return the name the device already carries.
+
+    /api/status reports ``name`` (the name in the MyHeatit app, or the
+    factory ``THERMOSTAT_<mac suffix>`` until someone renames it there) and
+    ``room`` (the room it is linked to). The name is kept as it is; the room
+    becomes the Home Assistant area instead, see
+    :meth:`HeatitWiFiEntity.device_info`. With neither field this is "" and
+    the box opens empty.
+    """
+    name = str(status.get("name") or "").strip()
+    return name or str(status.get("room") or "").strip()
+
+
 class HeatitWiFiConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle the user-driven config flow for Heatit WiFi thermostats."""
 
@@ -45,6 +59,7 @@ class HeatitWiFiConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         """Initialize the flow."""
         self._discovered_host: str | None = None
+        self._discovered_name: str = ""
 
     @staticmethod
     @callback
@@ -102,7 +117,8 @@ class HeatitWiFiConfigFlow(ConfigFlow, domain=DOMAIN):
 
         session = async_get_clientsession(self.hass)
         api = HeatitWiFiAPI(host, session)
-        device_id = await api.get_device_id(retries=1, timeout=10)
+        status = await api.get_status(retries=1, timeout=10)
+        device_id = status.get("id", "unknown")
         if device_id == "unknown":
             return self.async_abort(reason="cannot_connect")
 
@@ -112,7 +128,12 @@ class HeatitWiFiConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured(updates={CONF_HOST: host})
 
         self._discovered_host = host
-        self.context["title_placeholders"] = {"host": host}
+        self._discovered_name = _device_label(status)
+        # The discovery card truncates a long title, so show the bare IP
+        # instead of the full URL — that is the part the user needs to read.
+        self.context["title_placeholders"] = {
+            "host": str(discovery_info.ip_address)
+        }
         return await self.async_step_zeroconf_confirm()
 
     async def async_step_zeroconf_confirm(
@@ -132,7 +153,14 @@ class HeatitWiFiConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="zeroconf_confirm",
-            data_schema=vol.Schema({vol.Required(CONF_NAME): cv.string}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_NAME,
+                        description={"suggested_value": self._discovered_name},
+                    ): cv.string
+                }
+            ),
             description_placeholders={"host": self._discovered_host},
         )
 
