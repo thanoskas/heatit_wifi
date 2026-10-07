@@ -108,7 +108,7 @@ The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6
 * **2.1.0**
     * Fix: *Display measured temperature* did nothing on a WiFi7. Firmware 0.1.13 renamed `temperatureDisplay` to `displayInformation` and answers `Success` to the old name without acting on it, so the switch was stuck and every write was lost. It now reads and writes whichever name the thermostat reports.
     * Fix: a WiFi7 in Relay mode reports its contact as `close`, not the documented `Closed`, which left the relay switch reading the fallback parameter. Both spellings are accepted now.
-    * New: the room a thermostat is linked to in the MyHeatit app becomes its Home Assistant area when the device is added. A device you have already placed yourself is never moved.
+    * New: the room a thermostat is linked to in the MyHeatit app becomes its Home Assistant area when the device is added. A device you have already placed yourself is never moved. Home Assistant builds the entity IDs of a newly added device from its area, so a thermostat added after this update gets entity IDs that start with the room name; entity IDs that already exist are untouched.
     * New: diagnostic sensors for the Wi-Fi network (SSID) and for the DirectLink and BlueFusion links, with the linked devices in the attributes. Disabled by default, like the other diagnostics.
     * Discovery: the card shows the thermostat's own name as the suggested name (a WiFi7 nobody renamed in the app reports `THERMOSTAT_<MAC>`), and its address as a bare IP, which no longer gets cut off by the card.
 * **2.0.4**

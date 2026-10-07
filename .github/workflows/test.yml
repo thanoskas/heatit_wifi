@@ -56,7 +56,11 @@ jobs:
                 - delay: "00:00:10"
                 - service: climate.set_hvac_mode
                   target:
-                    entity_id: climate.mocked_heatit_thermostat
+                    # The mock answers with room "hall" (the example in the
+                    # OpenAPI spec), which becomes the device's area, and
+                    # Home Assistant builds new entity ids as
+                    # area + device + entity.
+                    entity_id: climate.hall_mocked_heatit_thermostat
                   data:
                     hvac_mode: heat
           CONF
