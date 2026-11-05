@@ -43,6 +43,9 @@ class HeatitWiFiNumberEntityDescription(NumberEntityDescription):
     payload_fn: Callable[[float], Any] | None = None
     # Parameters that only exist on the WiFi7 (e.g. Relay mode timers).
     wifi7_only: bool = False
+    # payload_fn converts to the WiFi6's 1-10 scale only: a WiFi7 stores the
+    # percentage itself and takes the Home Assistant value unscaled.
+    wifi6_only_payload: bool = False
 
 
 def _parameter_field(name: str) -> Callable[[dict[str, Any]], float | None]:
@@ -55,12 +58,26 @@ def _size_of_load(data: dict[str, Any]) -> float | None:
     return None if value is None else value * 100
 
 
+def _duty_cycle_in_percent(data: dict[str, Any]) -> bool:
+    """True when the device stores powerRegulatorActiveTime as a percentage.
+
+    The WiFi6 stores 1-10 (x10 %), the WiFi7 the percentage itself. Decided
+    by the model first: a WiFi7 set to 10 % would otherwise be read as a
+    WiFi6 at 100 %. The raw value is only a fallback for a WiFi7 that
+    reports no model, since the WiFi6 scale never goes above 10.
+    """
+    if data.get("model"):
+        return True
+    value = (data.get("parameters") or {}).get("powerRegulatorActiveTime")
+    return value is not None and value > 10
+
+
 def _power_regulator_active_time(data: dict[str, Any]) -> float | None:
-    # WiFi6 stores 1-10 (x10 %); WiFi7 reports 10-100 directly in 10 % steps.
     value = (data.get("parameters") or {}).get("powerRegulatorActiveTime")
     if value is None:
         return None
-    return float(value) if (data.get("model") or value > 10) else value * 10
+    # Kept as the reported int: float() would show 20 % as "20.0".
+    return value if _duty_cycle_in_percent(data) else value * 10
 
 
 def _action_after_error_payload(value: float) -> int:
@@ -193,6 +210,7 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFiNumberEntityDescription, ...] = (
         parameter="powerRegulatorActiveTime",
         value_fn=_power_regulator_active_time,
         payload_fn=lambda value: int(round(value / 10)),
+        wifi6_only_payload=True,
     ),
     # Floor limits protect e.g. wooden floors, so they are on by default;
     # the internal/external limits are opt-in.
@@ -336,11 +354,13 @@ class HeatitWiFiNumber(HeatitWiFiEntity, NumberEntity):
     async def async_set_native_value(self, value: float) -> None:
         """Write the new value to the device."""
         parameter = self._api_parameter()
+        description = self.entity_description
         payload: Any
-        is_wifi7 = bool((self.coordinator.data or {}).get("model"))
-        if self.entity_description.key == "power_regulator_active_time" and is_wifi7:
+        if description.wifi6_only_payload and _duty_cycle_in_percent(
+            self.coordinator.data or {}
+        ):
             payload = int(round(value))
-        elif (payload_fn := self.entity_description.payload_fn) is not None:
+        elif (payload_fn := description.payload_fn) is not None:
             payload = payload_fn(value)
         else:
             # Integer-step parameters (brightness, timers) are integers

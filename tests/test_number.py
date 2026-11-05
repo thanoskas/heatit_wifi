@@ -125,6 +125,23 @@ async def test_wifi7_power_regulator_active_time(
     assert hass.states.get(entity_id).state == "10"
 
 
+def _wifi7_without_model() -> dict:
+    status = copy.deepcopy(WIFI7_STATUS)
+    status.pop("model")
+    return status
+
+
+@pytest.mark.parametrize("status", [_wifi7_without_model()])
+async def test_wifi7_duty_cycle_without_model(
+    hass: HomeAssistant, config_entry, mock_api
+) -> None:
+    """Without a model field the read and the write must still agree."""
+    entity_id = "number.lab_thermostat_power_regulator_active_time"
+    assert hass.states.get(entity_id).state == "20"
+    await _set_value(hass, entity_id, 50)
+    mock_api["set_parameter"].assert_awaited_once_with("powerRegulatorActiveTime", 50)
+
+
 @pytest.mark.parametrize(
     ("value", "payload"),
     [(0, 0), (5, 0), (10, 10), (600.0, 600), (65535, 65535)],
