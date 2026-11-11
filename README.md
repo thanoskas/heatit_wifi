@@ -105,6 +105,9 @@ Unit tests use `pytest-homeassistant-custom-component` with a mocked device and 
 The device API is documented in `custom_components/heatit_wifi/docs/Heatit_WiFi6_OpenAPI_v70.yaml`. Parameters can also be changed directly with an HTTP POST to `/api/parameters`.
 
 ## Version history
+* **2.2.0**
+    * New: **Low temperature protection** on a WiFi7 (device parameter `lowTemperatureProtection`). A configuration number, disabled by default, that takes whole degrees from 0 to 10. Contributed by [@pkasarda](https://github.com/pkasarda) ([#8](https://github.com/thanoskas/heatit_wifi/pull/8)). The parameter appears in neither the WiFi6 API specification nor the WiFi7 manuals, so the range was verified against a WiFi7 on firmware 0.1.16: it accepts 0 and 10 and rejects 11, -1 and any fractional value with HTTP 400.
+    * The test suite passes again on current Home Assistant, which no longer accepts a device lookup by identifier, and now runs on Python 3.14. Also by [@pkasarda](https://github.com/pkasarda) ([#7](https://github.com/thanoskas/heatit_wifi/pull/7)).
 * **2.1.2**
     * Fix: *Power regulator active time* on a WiFi7. The WiFi6 stores the duty cycle as 1-10 (x10 %), the WiFi7 as the percentage itself, so on a WiFi7 the slider read ten times the real duty cycle (pinned at 100 %) and wrote back a tenth of what was asked. Reported and first fixed by [@jonas0b1011001](https://github.com/jonas0b1011001) ([#4](https://github.com/thanoskas/heatit_wifi/pull/4), [#5](https://github.com/thanoskas/heatit_wifi/pull/5)).
 * **2.1.1**
