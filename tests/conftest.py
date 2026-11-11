@@ -100,6 +100,7 @@ def _wifi7_status() -> dict[str, Any]:
     params["displayInformation"] = int(params.pop("temperatureDisplay"))
     params["sensorValue"] = 1  # 10 kOhm in the WiFi7 numbering
     params["externalSensorFallback"] = 2
+    params["lowTemperatureProtection"] = 5.0  # reported as a float
     params["activeDisplayBrightness"] = 70
     params["standbyDisplayBrightness"] = 30
     params["powerRegulatorActiveTime"] = 20

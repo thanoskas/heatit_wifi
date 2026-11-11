@@ -158,6 +158,9 @@
          "external_max_temperature": {
             "name": "External maximum temperature"
          },
+         "low_temperature_protection": {
+            "name": "Low temperature protection"
+         },
          "size_of_load": {
             "name": "Size of load"
          },

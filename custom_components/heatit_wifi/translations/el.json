@@ -158,6 +158,9 @@
          "external_max_temperature": {
             "name": "Μέγιστη εξωτερική θερμοκρασία"
          },
+         "low_temperature_protection": {
+            "name": "Προστασία χαμηλής θερμοκρασίας"
+         },
          "size_of_load": {
             "name": "Μέγεθος φορτίου"
          },

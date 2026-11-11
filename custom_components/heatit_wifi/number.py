@@ -221,6 +221,23 @@ NUMBER_DESCRIPTIONS: tuple[HeatitWiFiNumberEntityDescription, ...] = (
     _temperature_limit("external_min_temperature", "externalMinimumTemperatureLimit"),
     _temperature_limit("external_max_temperature", "externalMaximumTemperatureLimit"),
     HeatitWiFiNumberEntityDescription(
+        key="low_temperature_protection",
+        translation_key="low_temperature_protection",
+        entity_category=EntityCategory.CONFIG,
+        entity_registry_enabled_default=False,
+        device_class=NumberDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        # Frost protection: 0 disables it, 1-10 is the lowest temperature
+        # the thermostat allows. Not in the WiFi6 status.
+        native_min_value=0,
+        native_max_value=10,
+        native_step=1,
+        mode=NumberMode.BOX,
+        parameter="lowTemperatureProtection",
+        value_fn=_parameter_field("lowTemperatureProtection"),
+        wifi7_only=True,
+    ),
+    HeatitWiFiNumberEntityDescription(
         key="size_of_load",
         translation_key="size_of_load",
         entity_category=EntityCategory.CONFIG,

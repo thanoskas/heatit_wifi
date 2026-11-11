@@ -232,3 +232,23 @@ async def test_wifi7_relay_mode(hass: HomeAssistant, config_entry, mock_api) -> 
     await _set_value(hass, "number.lab_thermostat_automatic_turn_on", 120)
     mock_api["set_parameter"].assert_awaited_once_with("automaticTurnOn", 120)
     assert hass.states.get("number.lab_thermostat_automatic_turn_on").state == "120"
+
+
+@pytest.mark.parametrize("status", [copy.deepcopy(WIFI7_STATUS)])
+async def test_wifi7_low_temperature_protection(
+    hass: HomeAssistant, config_entry, mock_api
+) -> None:
+    """Frost protection is read and written as whole degrees, 0 = off."""
+    entity_id = "number.lab_thermostat_low_temperature_protection"
+    state = hass.states.get(entity_id)
+    assert state.state == "5.0"
+    assert (state.attributes["min"], state.attributes["max"]) == (0, 10)
+    await _set_value(hass, entity_id, 0)
+    mock_api["set_parameter"].assert_awaited_once_with("lowTemperatureProtection", 0)
+
+
+async def test_wifi6_has_no_low_temperature_protection(
+    hass: HomeAssistant, config_entry
+) -> None:
+    """The WiFi6 status has no lowTemperatureProtection, so no entity."""
+    assert hass.states.get("number.lab_thermostat_low_temperature_protection") is None

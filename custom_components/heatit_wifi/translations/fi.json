@@ -158,6 +158,9 @@
          "external_max_temperature": {
             "name": "Ulkoisen anturin maksimilämpötila"
          },
+         "low_temperature_protection": {
+            "name": "Alhaisen lämpötilan suojaus"
+         },
          "size_of_load": {
             "name": "Kuorman koko"
          },
